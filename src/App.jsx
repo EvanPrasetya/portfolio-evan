@@ -4,18 +4,20 @@ import {
   Download,
   FileText,
   X,
-  ChevronLeft,
-  ChevronRight,
   ExternalLink,
   Mail,
   MapPin,
-  Clock,
   Award,
   GraduationCap,
   Users,
   Menu,
   CheckCircle2,
   Eye,
+  Code2,
+  Cpu,
+  Trophy,
+  Sparkles,
+  ZoomIn,
 } from 'lucide-react';
 
 // Custom Social SVG Icons (GitHub, Instagram)
@@ -66,43 +68,449 @@ const ScrollReveal = ({ children, delay = 0, className = '' }) => {
   );
 };
 
+// ============================================================================
+// 1. INTERACTIVE 3D HANGING ID CARD (LANYARD) WITH EXACT TRIGONOMETRIC JOINT
+// ============================================================================
+const HangingIdCard = () => {
+  const stageRef = useRef(null);
+  const strapRef = useRef(null);
+  const cardRef = useRef(null);
+  const glareRef = useRef(null);
+  const [isDraggingUI, setIsDraggingUI] = useState(false);
+
+  // Base vertical distance (px) from top ceiling pivot to card lanyard slot
+  const BASE_STRAP_LEN = 122;
+
+  const physRef = useRef({
+    isDragging: false,
+    isHovering: false,
+    startX: 0,
+    startY: 0,
+    x: 0,
+    y: 0,
+    vx: 0,
+    vy: 0,
+    targetX: 0,
+    targetY: 0,
+    rotZ: 0,
+    vRotZ: 0,
+    rotX: 0,
+    vRotX: 0,
+    rotY: 0,
+    vRotY: 0,
+    targetRotX: 0,
+    targetRotY: 0,
+  });
+
+  useEffect(() => {
+    let rafId;
+    const p = physRef.current;
+
+    const animate = (time) => {
+      if (p.isDragging) {
+        const dx = p.targetX - p.x;
+        const dy = p.targetY - p.y;
+        p.vx = dx * 0.34;
+        p.vy = dy * 0.34;
+        p.x += p.vx;
+        p.y += p.vy;
+
+        // Calculate exact rope vector from ceiling anchor (0, 0) to card hook (p.x, BASE_STRAP_LEN + p.y)
+        const hookX = p.x;
+        const hookY = Math.max(45, BASE_STRAP_LEN + p.y);
+        const ropeAngleDeg = -Math.atan2(hookX, hookY) * (180 / Math.PI);
+
+        // Card aligns naturally with the lanyard angle plus slight inertia swing
+        const desiredRotZ = Math.max(-42, Math.min(42, ropeAngleDeg - p.vx * 0.28));
+        p.rotZ += (desiredRotZ - p.rotZ) * 0.32;
+
+        // 3D depth tilt while dragging
+        const desiredRotY = Math.max(-28, Math.min(28, p.x * 0.13 + p.vx * 0.25));
+        const desiredRotX = Math.max(-22, Math.min(22, -p.y * 0.11 - p.vy * 0.18));
+        p.rotY += (desiredRotY - p.rotY) * 0.28;
+        p.rotX += (desiredRotX - p.rotX) * 0.28;
+      } else {
+        // Spring physics back to center equilibrium
+        const stiffness = 0.08;
+        const damping = 0.85;
+
+        // Subtle ambient pendulum sway when idle
+        const idleX = p.isHovering ? 0 : Math.sin(time * 0.0016) * 6;
+        const ax = (idleX - p.x) * stiffness;
+        const ay = (0 - p.y) * stiffness;
+        p.vx = (p.vx + ax) * damping;
+        p.vy = (p.vy + ay) * damping;
+        p.x += p.vx;
+        p.y += p.vy;
+
+        const hookX = p.x;
+        const hookY = Math.max(45, BASE_STRAP_LEN + p.y);
+        const ropeAngleDeg = -Math.atan2(hookX, hookY) * (180 / Math.PI);
+
+        const idleSwayY = p.isHovering ? p.targetRotY : Math.cos(time * 0.0015) * 4.5;
+        const idleSwayX = p.isHovering ? p.targetRotX : Math.sin(time * 0.0013) * 2.0;
+
+        // Pendulum swing physics locked to rope angle
+        const targetZ = ropeAngleDeg - p.vx * 0.45;
+        const aRotZ = (targetZ - p.rotZ) * 0.14;
+        p.vRotZ = (p.vRotZ + aRotZ) * 0.82;
+        p.rotZ += p.vRotZ;
+
+        // 3D Tilt X & Y spring
+        const aRotX = (idleSwayX - p.rotX) * 0.11;
+        const aRotY = (idleSwayY - p.rotY) * 0.11;
+        p.vRotX = (p.vRotX + aRotX) * 0.82;
+        p.vRotY = (p.vRotY + aRotY) * 0.82;
+        p.rotX += p.vRotX;
+        p.rotY += p.vRotY;
+      }
+
+      // Exact trigonometric distance & angle from top ceiling pivot (0,0) to card hook (p.x, BASE_STRAP_LEN + p.y)
+      // This guarantees the strap and metal clip NEVER detach or leave a gap!
+      const hookX = p.x;
+      const hookY = Math.max(45, BASE_STRAP_LEN + p.y);
+      const exactLength = Math.hypot(hookX, hookY);
+      const exactAngleDeg = -Math.atan2(hookX, hookY) * (180 / Math.PI);
+
+      if (strapRef.current) {
+        strapRef.current.style.height = `${exactLength + 6}px`;
+        strapRef.current.style.transform = `translate3d(-50%, 0, 0) rotate(${exactAngleDeg}deg)`;
+      }
+
+      // Update 3D ID Card Transform (Anchored right at the hook joint)
+      if (cardRef.current) {
+        cardRef.current.style.transform = `translate3d(${p.x}px, ${p.y}px, 0) rotateZ(${p.rotZ}deg) rotateX(${p.rotX}deg) rotateY(${p.rotY}deg)`;
+      }
+
+      // Update Specular Glare Reflection
+      if (glareRef.current) {
+        const gx = Math.max(0, Math.min(100, 50 + p.rotY * 1.8));
+        const gy = Math.max(0, Math.min(100, 35 - p.rotX * 1.8));
+        glareRef.current.style.background = `radial-gradient(circle at ${gx}% ${gy}%, rgba(255,255,255,0.26) 0%, rgba(56,189,248,0.10) 38%, transparent 70%)`;
+      }
+
+      rafId = requestAnimationFrame(animate);
+    };
+
+    rafId = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(rafId);
+  }, []);
+
+  const handlePointerDown = (e) => {
+    const p = physRef.current;
+    p.isDragging = true;
+    setIsDraggingUI(true);
+    p.startX = e.clientX - p.x;
+    p.startY = e.clientY - p.y;
+    if (e.currentTarget.setPointerCapture) {
+      try {
+        e.currentTarget.setPointerCapture(e.pointerId);
+      } catch {
+        // Ignore capture errors
+      }
+    }
+  };
+
+  const handlePointerMove = (e) => {
+    const p = physRef.current;
+    if (p.isDragging) {
+      const rawX = e.clientX - p.startX;
+      const rawY = e.clientY - p.startY;
+      p.targetX = Math.max(-185, Math.min(185, rawX));
+      p.targetY = Math.max(-65, Math.min(155, rawY));
+    } else if (stageRef.current) {
+      p.isHovering = true;
+      const rect = stageRef.current.getBoundingClientRect();
+      const relX = (e.clientX - rect.left) / rect.width - 0.5;
+      const relY = (e.clientY - rect.top) / rect.height - 0.5;
+      p.targetRotY = relX * 26;
+      p.targetRotX = -relY * 22;
+    }
+  };
+
+  const handlePointerUp = () => {
+    const p = physRef.current;
+    if (p.isDragging) {
+      p.isDragging = false;
+      setIsDraggingUI(false);
+    }
+  };
+
+  const handlePointerLeave = () => {
+    const p = physRef.current;
+    p.isHovering = false;
+    if (!p.isDragging) {
+      p.targetRotX = 0;
+      p.targetRotY = 0;
+    }
+  };
+
+  return (
+    <div
+      ref={stageRef}
+      onPointerMove={handlePointerMove}
+      onPointerUp={handlePointerUp}
+      onPointerCancel={handlePointerUp}
+      onPointerLeave={handlePointerLeave}
+      className="relative w-full h-[510px] sm:h-[560px] flex flex-col items-center justify-start select-none overflow-visible"
+      style={{ perspective: '1300px' }}
+    >
+      {/* Ambient Backlight Glow Behind Hanging ID Card */}
+      <div
+        className="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-72 h-72 sm:w-88 sm:h-88 rounded-full opacity-75 blur-2xl"
+        style={{
+          background:
+            'radial-gradient(circle, rgba(59, 130, 246, 0.32) 0%, rgba(56, 189, 248, 0.08) 55%, transparent 75%)',
+        }}
+      />
+
+      {/* Top Ceiling Anchor Mount */}
+      <div className="relative z-40 w-12 h-2.5 rounded-b-lg bg-gradient-to-r from-slate-700 via-slate-400 to-slate-700 border border-white/20 shadow-md" />
+
+      {/* LANYARD STRAP (Dynamically stretches & rotates to exact card hook coordinates — never breaks!) */}
+      <div
+        ref={strapRef}
+        style={{
+          height: `${BASE_STRAP_LEN + 6}px`,
+          transformOrigin: 'top center',
+          willChange: 'transform, height',
+        }}
+        className="absolute top-0 left-1/2 z-40 flex flex-col items-center pointer-events-none"
+      >
+        {/* Black Fabric Lanyard Ribbon with Branding Text (flex-1 so it stretches seamlessly without distorting the metal clip) */}
+        <div className="w-10 sm:w-11 flex-1 min-h-[48px] bg-gradient-to-b from-[#060B14] via-[#111C2F] to-[#080E1A] border-x border-white/15 shadow-[0_10px_25px_rgba(0,0,0,0.8)] flex flex-col items-center justify-center overflow-hidden relative">
+          {/* Fabric Stitch Lines */}
+          <div className="absolute inset-y-0 left-1 w-px border-l border-dashed border-white/15" />
+          <div className="absolute inset-y-0 right-1 w-px border-r border-dashed border-white/15" />
+
+          {/* Vertical Branding on Lanyard Ribbon */}
+          <div
+            style={{ writingMode: 'vertical-rl' }}
+            className="flex items-center gap-1.5 text-[10px] sm:text-[11px] font-display font-extrabold tracking-[0.18em] text-[#F1F5F9]/90 uppercase py-1"
+          >
+            <span className="w-4 h-4 rounded-full border border-[#38BDF8] text-[#38BDF8] flex items-center justify-center text-[8px] font-mono shrink-0">
+              E
+            </span>
+            <span className="whitespace-nowrap">Evan Prasetya</span>
+          </div>
+        </div>
+
+        {/* Metallic Silver Clamp (Fixed proportions, never distorted) */}
+        <div className="w-11 sm:w-12 h-3.5 shrink-0 rounded-[4px] bg-gradient-to-r from-slate-400 via-slate-100 to-slate-500 border border-white/50 shadow-md flex items-center justify-center">
+          <div className="w-6 h-1 rounded-full bg-slate-700/40" />
+        </div>
+        {/* Metal Hook Ring connecting directly into the Card Slot Hole */}
+        <div className="w-3.5 h-5 -mt-1 shrink-0 rounded-full border-[3px] border-slate-200 shadow-[0_2px_6px_rgba(0,0,0,0.85)] bg-transparent" />
+      </div>
+
+      {/* 3D DRAGGABLE ID CARD HOLDER (Pivot origin set directly at top slot hole `50% 14px`) */}
+      <div
+        ref={cardRef}
+        onPointerDown={handlePointerDown}
+        style={{
+          transformStyle: 'preserve-3d',
+          transformOrigin: '50% 14px',
+          willChange: 'transform',
+          touchAction: 'none',
+        }}
+        className={`relative z-30 mt-[112px] w-[286px] sm:w-[322px] rounded-[20px] p-2.5 bg-gradient-to-b from-[#17253B] via-[#0B1322] to-[#070C16] border-[2px] ${
+          isDraggingUI ? 'border-[#38BDF8] cursor-grabbing' : 'border-white/20 cursor-grab'
+        } shadow-[0_28px_65px_rgba(0,0,0,0.9),0_0_30px_rgba(59,130,246,0.2)] transition-colors duration-200`}
+      >
+        {/* Dynamic Glare Overlay */}
+        <div
+          ref={glareRef}
+          className="pointer-events-none absolute inset-0 rounded-[18px] z-30 mix-blend-screen transition-opacity duration-200"
+        />
+
+        {/* Top Lanyard Slot Cutout Hole */}
+        <div className="mx-auto mb-2 w-14 h-3 rounded-full bg-[#050912] border border-white/20 shadow-inner flex items-center justify-center">
+          <div className="w-2.5 h-2.5 rounded-full bg-slate-300/30" />
+        </div>
+
+        {/* INNER EDITORIAL POSTER CARD */}
+        <div className="relative rounded-[14px] overflow-hidden bg-[#EBE7DC] text-[#0E1E38] border border-[#0E1E38]/20 shadow-inner">
+          {/* Subtle Technical Grid Background on Cream Card */}
+          <div
+            className="pointer-events-none absolute inset-0 opacity-25"
+            style={{
+              backgroundImage:
+                'linear-gradient(to right, rgba(14, 30, 56, 0.22) 1px, transparent 1px), linear-gradient(to bottom, rgba(14, 30, 56, 0.22) 1px, transparent 1px)',
+              backgroundSize: '20px 20px',
+            }}
+          />
+
+          {/* Top Bar: Role Badge & University Identity */}
+          <div className="relative z-10 px-3.5 pt-3 pb-1 flex items-center justify-between">
+            <span className="px-2.5 py-0.5 bg-[#0E1E38] text-[#EBE7DC] font-display font-black text-[10px] tracking-[0.16em] uppercase">
+              FULL-STACK
+            </span>
+            <div className="flex items-center gap-1.5 text-right">
+              <div className="w-5 h-5 rounded-full bg-[#0E1E38] text-[#38BDF8] flex items-center justify-center font-mono text-[8px] font-black">
+                USM
+              </div>
+              <div className="leading-[1.05] font-display font-extrabold text-[8px] text-[#0E1E38] uppercase tracking-tight">
+                <div>UNIVERSITAS</div>
+                <div>SEMARANG</div>
+              </div>
+            </div>
+          </div>
+
+          {/* Giant Editorial Headline "DEVELOPER" Behind Portrait */}
+          <div className="relative z-10 px-3 pt-0.5">
+            <div className="border-y border-[#0E1E38]/40 py-1 relative flex items-center justify-center">
+              <span className="absolute -top-1 -left-1 w-1.5 h-1.5 rounded-full bg-[#0E1E38]" />
+              <span className="absolute -top-1 -right-1 w-1.5 h-1.5 rounded-full bg-[#0E1E38]" />
+              <span className="absolute -bottom-1 -left-1 w-1.5 h-1.5 rounded-full bg-[#0E1E38]" />
+              <span className="absolute -bottom-1 -right-1 w-1.5 h-1.5 rounded-full bg-[#0E1E38]" />
+
+              <div className="font-display font-black text-[38px] sm:text-[43px] leading-none tracking-[-0.04em] text-[#0E1E38] uppercase select-none">
+                DEVELOPER
+              </div>
+
+              <span className="absolute left-[34%] top-1/2 -translate-y-1/2 -rotate-12 px-1.5 py-0.5 bg-[#EBE7DC] border border-[#0E1E38] font-mono text-[7px] font-black uppercase tracking-wider text-[#0E1E38] shadow-sm">
+                VERIFIED
+              </span>
+            </div>
+          </div>
+
+          {/* Center Composition: Ocean Blue Window + Vertical Title + Cutout Photo */}
+          <div className="relative z-10 px-3.5 pt-2 h-[225px] sm:h-[250px] flex items-end justify-center">
+            <div className="absolute left-3.5 top-3 bottom-4 w-[58%] rounded-[4px] bg-gradient-to-br from-[#0F294A] via-[#153B6B] to-[#0A182E] overflow-hidden border border-[#0E1E38]/30 shadow-inner">
+              <div
+                className="absolute inset-0 opacity-30"
+                style={{
+                  backgroundImage:
+                    'radial-gradient(circle at 30% 30%, rgba(56, 189, 248, 0.45), transparent 65%)',
+                }}
+              />
+            </div>
+
+            <div className="absolute right-3.5 top-3 bottom-4 w-[28%] border border-[#0E1E38]/40 flex items-center justify-center">
+              <span className="absolute -top-1 -left-1 w-1.5 h-1.5 rounded-full bg-[#0E1E38]" />
+              <span className="absolute -top-1 -right-1 w-1.5 h-1.5 rounded-full bg-[#0E1E38]" />
+              <span className="absolute -bottom-1 -left-1 w-1.5 h-1.5 rounded-full bg-[#0E1E38]" />
+              <span className="absolute -bottom-1 -right-1 w-1.5 h-1.5 rounded-full bg-[#0E1E38]" />
+              <div
+                style={{ writingMode: 'vertical-rl' }}
+                className="rotate-180 font-display font-black text-[18px] sm:text-[20px] tracking-[0.04em] text-[#0E1E38] uppercase whitespace-nowrap select-none"
+              >
+                SISTEM INFORMASI
+              </div>
+            </div>
+
+            <img
+              src="/evan-cutout.png"
+              alt="Alfarell Nabil Evan Prasetya"
+              draggable={false}
+              className="relative z-20 h-[106%] w-auto object-contain object-bottom drop-shadow-[0_10px_18px_rgba(10,20,36,0.55)] pointer-events-none select-none"
+              onError={(e) => {
+                e.currentTarget.src = '/evan-profile.jpg';
+              }}
+            />
+
+            <div className="absolute bottom-3.5 left-4 z-30 -rotate-2 bg-[#EBE7DC] border-[1.5px] border-[#0E1E38] px-2.5 py-1 shadow-[0_6px_14px_rgba(0,0,0,0.35)]">
+              <span className="font-display font-black text-[10px] sm:text-[11px] tracking-[0.04em] text-[#0E1E38] uppercase block">
+                ALFARELL NABIL EVAN P.
+              </span>
+            </div>
+          </div>
+
+          {/* Bottom Navy Footer Strip inside ID Card */}
+          <div className="relative z-20 bg-[#0E1E38] text-[#EBE7DC] px-3.5 py-2.5 flex items-center justify-between">
+            <span className="font-display font-black text-[16px] sm:text-[18px] tracking-tight uppercase leading-none">
+              PORTFOLIO
+            </span>
+            <div className="flex items-center gap-2">
+              <span className="font-mono text-[7px] text-[#38BDF8] tracking-widest uppercase">
+                (((((●)))))
+              </span>
+              <div className="font-mono text-[8px] leading-[1.15] text-[#EBE7DC]/80 text-right">
+                <div>Clean code</div>
+                <div>&amp; architecture</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// ============================================================================
+// 2. INTERACTIVE 3D TILT CARD FOR CERTIFICATES & PROJECT SHOWCASE
+// ============================================================================
+const Interactive3DCard = ({ children, onClick, className = '' }) => {
+  const cardRef = useRef(null);
+  const glareRef = useRef(null);
+
+  const handleMouseMove = (e) => {
+    const el = cardRef.current;
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+
+    const rotateX = ((y - centerY) / centerY) * -10;
+    const rotateY = ((x - centerX) / centerX) * 10;
+
+    el.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
+
+    if (glareRef.current) {
+      const gx = (x / rect.width) * 100;
+      const gy = (y / rect.height) * 100;
+      glareRef.current.style.opacity = '1';
+      glareRef.current.style.background = `radial-gradient(circle at ${gx}% ${gy}%, rgba(56, 189, 248, 0.22) 0%, rgba(255, 255, 255, 0.06) 40%, transparent 70%)`;
+    }
+  };
+
+  const handleMouseLeave = () => {
+    const el = cardRef.current;
+    if (!el) return;
+    el.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)';
+    if (glareRef.current) {
+      glareRef.current.style.opacity = '0';
+    }
+  };
+
+  return (
+    <div
+      ref={cardRef}
+      onClick={onClick}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      style={{
+        transition: 'transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.25s ease',
+        transformStyle: 'preserve-3d',
+        willChange: 'transform',
+      }}
+      className={`relative ${className}`}
+    >
+      <div
+        ref={glareRef}
+        style={{ opacity: 0 }}
+        className="pointer-events-none absolute inset-0 rounded-[inherit] z-20 transition-opacity duration-300"
+      />
+      {children}
+    </div>
+  );
+};
+
 export default function App() {
   const [activeNav, setActiveNav] = useState('profile');
+  const [portfolioTab, setPortfolioTab] = useState('projects'); // 'projects' | 'certificates' | 'achievements' | 'techstack'
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [selectedProject, setSelectedProject] = useState(null);
   const [selectedCertificate, setSelectedCertificate] = useState(null);
-  const [activeCertIndex, setActiveCertIndex] = useState(0);
   const [showCVModal, setShowCVModal] = useState(false);
   const [zoomedImage, setZoomedImage] = useState(null);
-  const [localTime, setLocalTime] = useState('');
   const [scrollProgress, setScrollProgress] = useState(0);
 
   const cvFileUrl = '/CV - Alfarell Nabil Evan Prasetya.pdf';
 
-  // Live Local Time WIB (Semarang, Indonesia)
-  useEffect(() => {
-    const updateClock = () => {
-      try {
-        const now = new Date();
-        const formatter = new Intl.DateTimeFormat('en-GB', {
-          timeZone: 'Asia/Jakarta',
-          hour: '2-digit',
-          minute: '2-digit',
-          second: '2-digit',
-          hour12: false,
-        });
-        setLocalTime(formatter.format(now));
-      } catch {
-        const now = new Date();
-        setLocalTime(now.toTimeString().slice(0, 8));
-      }
-    };
-    updateClock();
-    const timer = setInterval(updateClock, 1000);
-    return () => clearInterval(timer);
-  }, []);
-
-  // Passive Scroll Progress Bar (Top Indicator for tangible scroll feedback)
+  // Passive Scroll Progress Bar
   useEffect(() => {
     let ticking = false;
     const onScroll = () => {
@@ -111,7 +519,8 @@ export default function App() {
           const scrollTop = window.scrollY || document.documentElement.scrollTop;
           const docHeight =
             document.documentElement.scrollHeight - document.documentElement.clientHeight;
-          const progress = docHeight > 0 ? Math.min(100, Math.max(0, (scrollTop / docHeight) * 100)) : 0;
+          const progress =
+            docHeight > 0 ? Math.min(100, Math.max(0, (scrollTop / docHeight) * 100)) : 0;
           setScrollProgress(progress);
           ticking = false;
         });
@@ -124,7 +533,7 @@ export default function App() {
 
   // Lightweight IntersectionObserver for Active Section Indicator
   useEffect(() => {
-    const sectionIds = ['profile', 'selected', 'credentials', 'career', 'contact'];
+    const sectionIds = ['profile', 'about', 'selected', 'career', 'contact'];
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -159,16 +568,22 @@ export default function App() {
     return () => window.removeEventListener('keydown', onKeyDown);
   }, [zoomedImage, selectedProject, selectedCertificate, showCVModal, mobileMenuOpen]);
 
-  // Navigasi Utama (Bahasa Indonesia + Kode Editorial)
+  // Navigasi Utama
   const navItems = [
-    { id: 'profile', code: '01', label: 'PROFIL', href: '#profile' },
-    { id: 'selected', code: '02', label: 'PROYEK', href: '#selected' },
-    { id: 'credentials', code: '03', label: 'SERTIFIKAT', href: '#credentials' },
-    { id: 'career', code: '04', label: 'PENDIDIKAN', href: '#career' },
-    { id: 'contact', code: '05', label: 'KONTAK', href: '#contact' },
+    { id: 'profile', code: '01', label: 'PROFIL', href: '#profile', tab: null },
+    { id: 'selected', code: '02', label: 'PORTFOLIO', href: '#selected', tab: 'projects' },
+    {
+      id: 'credentials',
+      code: '03',
+      label: 'SERTIFIKAT',
+      href: '#selected',
+      tab: 'certificates',
+    },
+    { id: 'career', code: '04', label: 'PENDIDIKAN', href: '#career', tab: null },
+    { id: 'contact', code: '05', label: 'KONTAK', href: '#contact', tab: null },
   ];
 
-  // Spesialisasi & Keahlian (Sesuai dengan Projek Asli: WebGuard, Cobain AI Studio, Stand Chilla, CleanRide)
+  // Spesialisasi & Keahlian (Sesuai dengan Projek Asli)
   const specializations = [
     {
       num: '01',
@@ -262,12 +677,12 @@ export default function App() {
     {
       id: 'cobain-ai-studio',
       number: '02',
-      title: 'Cobain AI Studio — Real-Time Virtual Try-On & Multimodal AI',
+      title: 'Cobain AI Studio — Virtual Try-On & Multimodal AI',
       category: 'AI & FULL-STACK WEB APP',
       year: '2026',
       thumbnail: '/Screenshot (140).png',
       shortDesc:
-        'Aplikasi web interaktif berbasis Next.js App Router yang mengintegrasikan teknologi Real-Time Video AI (Decart AI SDK) untuk virtual try-on pakaian instan via kamera, didukung asisten cerdas Google Gemini dan generator gambar.',
+        'Aplikasi web interaktif berbasis Next.js App Router yang mengintegrasikan teknologi Real-Time Video AI (Decart AI SDK) untuk virtual try-on pakaian instan via kamera, didukung asisten cerdas Google Gemini.',
       tags: ['Next.js', 'TypeScript', 'Decart AI SDK', 'Google Gemini API', 'Tailwind CSS'],
       githubUrl: 'https://github.com/EvanPrasetya',
       details: {
@@ -370,12 +785,12 @@ export default function App() {
       },
       gallery: [
         { src: '/1.png', caption: 'Landing Page Utama & Informasi Layanan CleanRide' },
-        { src: '/2.png', caption: 'Tahap 1: Pemilihan Paket Layanan & Kategori Ukuran Kendaraan' },
-        { src: '/3.png', caption: 'Tahap 2: Penjadwalan Tanggal Kedatangan & Slot Jam Pencucian' },
-        { src: '/4.png', caption: 'Tahap 3: Pengisian Data Pelanggan & Detail Nomor Polisi' },
-        { src: '/5.png', caption: 'Tahap 4: Ringkasan Total Biaya & Pemilihan Metode Pembayaran' },
+        { src: '/3.png', caption: 'Tahap 1: Pemilihan Paket Layanan & Kategori Ukuran Kendaraan' },
+        { src: '/4.png', caption: 'Tahap 2: Pengisian Data Pelanggan & Detail Nomor Polisi' },
+        { src: '/5.png', caption: 'Tahap 3: Penjadwalan Tanggal Kedatangan & Slot Jam Pencucian' },
+        { src: '/6.png', caption: 'Tahap 4: Ringkasan Total Biaya & Pemilihan Metode Pembayaran' },
         {
-          src: '/6.png',
+          src: '/2.png',
           caption: 'Halaman Konfirmasi Pesanan Berhasil & Status Menunggu Pembayaran',
         },
       ],
@@ -425,13 +840,21 @@ export default function App() {
     },
   ];
 
-  const handlePrevCert = () => {
-    setActiveCertIndex((prev) => (prev === 0 ? credentialsList.length - 1 : prev - 1));
-  };
-
-  const handleNextCert = () => {
-    setActiveCertIndex((prev) => (prev === credentialsList.length - 1 ? 0 : prev + 1));
-  };
+  // Daftar Tech Stack untuk Tab "Tech Stack" di Portfolio Showcase
+  const techStackGrid = [
+    { name: 'Laravel 11', category: 'Backend Framework', badge: 'PHP / MVC / REST API' },
+    { name: 'React.js', category: 'Frontend Library', badge: 'Component UI / Hooks' },
+    { name: 'Next.js', category: 'Full-Stack Framework', badge: 'App Router / SSR' },
+    { name: 'TypeScript', category: 'Typed JavaScript', badge: 'Type-Safe Architecture' },
+    { name: 'Tailwind CSS', category: 'Styling Engine', badge: 'Modern Utility UI' },
+    { name: 'MySQL', category: 'Relational Database', badge: 'ERD & Query Design' },
+    { name: 'Google Gemini API', category: 'Multimodal AI', badge: 'AI Assistant & Prompting' },
+    { name: 'Decart AI SDK', category: 'Real-Time Video AI', badge: 'WebRTC Virtual Try-On' },
+    { name: 'VirusTotal API', category: 'Cybersecurity API', badge: 'URL Threat Intelligence' },
+    { name: 'Figma', category: 'UI/UX Design', badge: 'Wireframing & Prototyping' },
+    { name: 'Postman', category: 'API Testing', badge: 'Endpoint Validation' },
+    { name: 'Git & GitHub', category: 'Version Control', badge: 'Collaborative Workflow' },
+  ];
 
   return (
     <div className="min-h-screen bg-[#0A1424] text-[#F1F5F9] font-sans antialiased selection:bg-[#3B82F6] selection:text-white relative overflow-x-hidden">
@@ -446,34 +869,45 @@ export default function App() {
         </div>
 
         <div className="max-w-[1440px] mx-auto px-4 sm:px-8 md:pl-16 lg:px-12 h-16 sm:h-20 flex items-center justify-between">
-          {/* Left: EVAN.PRASETYA Logo */}
+          {/* Left: EVAN PRASETYA Logo */}
           <a
             href="#profile"
             className="group flex items-center gap-2 focus:outline-none select-none"
           >
-            <span className="font-display font-extrabold text-[18px] sm:text-[22px] tracking-[-0.03em] text-[#F1F5F9] flex items-center">
+            <span className="font-display font-extrabold text-[17px] sm:text-[21px] tracking-[-0.03em] text-[#F1F5F9] flex items-center">
               <span>EVAN</span>
-              <span className="w-1.5 h-1.5 rounded-full bg-[#3B82F6] inline-block mx-1 shadow-[0_0_10px_#3B82F6]" />
+              <span className="w-1.5 h-1.5 rounded-full bg-[#3B82F6] inline-block mx-1.5 shadow-[0_0_10px_#3B82F6]" />
               <span className="text-[#60A5FA]">PRASETYA</span>
             </span>
           </a>
 
-          {/* Center: Numbered Editorial Navigation (Visible from md / 768px and up, no need to zoom) */}
+          {/* Center: Numbered Editorial Navigation */}
           <nav
             aria-label="Navigasi Utama"
             className="hidden md:flex items-center divide-x divide-[#263B59]/60 border border-[#263B59]/70 bg-[#101E33]/80"
           >
             {navItems.map((item) => {
-              const isActive = activeNav === item.id;
+              const isActive =
+                activeNav === item.id ||
+                (activeNav === 'selected' &&
+                  item.id === 'credentials' &&
+                  portfolioTab === 'certificates') ||
+                (activeNav === 'selected' &&
+                  item.id === 'selected' &&
+                  portfolioTab !== 'certificates');
               return (
                 <a
                   key={item.id}
                   href={item.href}
-                  onClick={() => setActiveNav(item.id)}
-                  className={`relative px-3 lg:px-4 xl:px-5 py-2 font-mono text-[10px] lg:text-[11px] font-semibold tracking-[0.15em] transition-colors duration-200 ${isActive
-                    ? 'text-[#F1F5F9] bg-[#152640]'
-                    : 'text-[#94A3B8] hover:text-[#F1F5F9] hover:bg-[#152640]/50'
-                    }`}
+                  onClick={() => {
+                    setActiveNav(item.id);
+                    if (item.tab) setPortfolioTab(item.tab);
+                  }}
+                  className={`relative px-3 lg:px-4 xl:px-5 py-2 font-mono text-[10px] lg:text-[11px] font-semibold tracking-[0.15em] transition-colors duration-200 ${
+                    isActive
+                      ? 'text-[#F1F5F9] bg-[#152640]'
+                      : 'text-[#94A3B8] hover:text-[#F1F5F9] hover:bg-[#152640]/50'
+                  }`}
                 >
                   <span className="text-[#38BDF8] mr-1">[{item.code}</span>
                   <span>{item.label}]</span>
@@ -508,7 +942,7 @@ export default function App() {
           </div>
         </div>
 
-        {/* Mobile Dropdown Menu (Android / Phone View) */}
+        {/* Mobile Dropdown Menu */}
         {mobileMenuOpen && (
           <div className="md:hidden border-t border-[#263B59] bg-[#0A1424]/98 backdrop-blur-lg px-5 py-4 space-y-3 shadow-2xl">
             <div className="flex items-center justify-between pb-2.5 border-b border-[#263B59]/60">
@@ -526,6 +960,7 @@ export default function App() {
                   href={item.href}
                   onClick={() => {
                     setActiveNav(item.id);
+                    if (item.tab) setPortfolioTab(item.tab);
                     setMobileMenuOpen(false);
                   }}
                   className="py-3 font-mono text-xs font-bold tracking-[0.18em] text-[#F1F5F9] active:text-[#38BDF8] flex items-center justify-between"
@@ -544,10 +979,9 @@ export default function App() {
 
       {/* =====================================================================
           SOCIAL RAIL & QUICK ACCESS BAR:
-          - Desktop & Tablet (md+): ALWAYS VISIBLE on the left side at 100% zoom, 90% zoom, or 110% zoom!
-          - Android / Mobile (< md): ALWAYS VISIBLE as a sleek bottom bar so it works everywhere consistently!
+          - Desktop & Tablet (md+): ALWAYS VISIBLE on the left side
+          - Android / Mobile (< md): ALWAYS VISIBLE as a sleek bottom dock
          ===================================================================== */}
-      {/* Desktop / Laptop / Tablet Left Rail (Always Visible on md and up, no xl restriction!) */}
       <aside
         aria-label="Tautan Cepat Sosial & CV"
         className="fixed left-2.5 sm:left-3.5 lg:left-5 top-1/2 -translate-y-1/2 z-40 hidden md:flex flex-col items-center gap-3.5 select-none"
@@ -589,7 +1023,7 @@ export default function App() {
         <div className="w-px h-10 bg-[#263B59]" />
       </aside>
 
-      {/* Android & Mobile Floating Quick-Access Dock (Always Visible on Mobile Screens < md) */}
+      {/* Android & Mobile Floating Quick-Access Dock */}
       <aside
         aria-label="Menu Cepat Mobile & Android"
         className="md:hidden fixed bottom-4 inset-x-0 z-40 flex justify-center px-4 pointer-events-none"
@@ -631,10 +1065,10 @@ export default function App() {
         </div>
       </aside>
 
-      {/* MAIN CONTENT (With left padding on md+ so the persistent social rail never overlaps content) */}
+      {/* MAIN CONTENT */}
       <main className="relative z-10 pt-16 sm:pt-20 pb-20 md:pb-0">
         {/* =====================================================================
-            01. HERO — PROFIL (EDITORIAL ASYMMETRIC COMPOSITION WITH PORTRAIT)
+            01. HERO — PROFIL (DENGAN 3D INTERACTIVE HANGING ID CARD)
            ===================================================================== */}
         <section
           id="profile"
@@ -660,10 +1094,10 @@ export default function App() {
             </span>
           </div>
 
-          <div className="relative z-10 max-w-[1440px] mx-auto px-4 sm:px-8 md:pl-16 lg:pl-20 lg:pr-12 pt-6 sm:pt-12 pb-14 sm:pb-16 lg:pb-24">
+          <div className="relative z-10 max-w-[1440px] mx-auto px-4 sm:px-8 md:pl-16 lg:pl-20 lg:pr-12 pt-6 sm:pt-10 pb-14 sm:pb-16 lg:pb-24">
             {/* Top Editorial Meta Strip */}
             <ScrollReveal>
-              <div className="flex flex-wrap items-center justify-between gap-3 pb-5 mb-8 lg:mb-14 border-b border-[#263B59]/80">
+              <div className="flex flex-wrap items-center justify-between gap-3 pb-5 mb-6 lg:mb-10 border-b border-[#263B59]/80">
                 <div className="font-mono text-[10px] sm:text-[12px] font-bold tracking-[0.22em] uppercase text-[#38BDF8]">
                   [ 01 . PROFIL ]
                 </div>
@@ -674,8 +1108,8 @@ export default function App() {
               </div>
             </ScrollReveal>
 
-            {/* Main Editorial Hero Grid: Left Typography + Right Large Portrait Composition */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-end">
+            {/* Main Editorial Hero Grid: Left Typography + Right 3D Hanging ID Card */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center">
               {/* Left Column (7 Cols) */}
               <div className="lg:col-span-7 space-y-6 sm:space-y-8 order-2 lg:order-1">
                 <ScrollReveal delay={80}>
@@ -721,9 +1155,10 @@ export default function App() {
                   <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5 pt-1">
                     <a
                       href="#selected"
+                      onClick={() => setPortfolioTab('projects')}
                       className="inline-flex items-center justify-center gap-3 bg-[#3B82F6] hover:bg-[#60A5FA] text-[#0A1424] font-mono text-[11px] font-bold tracking-[0.18em] uppercase px-6 sm:px-7 py-3.5 sm:py-4 transition-colors duration-200"
                     >
-                      <span>LIHAT PROYEK SAYA</span>
+                      <span>LIHAT PORTFOLIO</span>
                       <ArrowUpRight className="w-4 h-4" />
                     </a>
 
@@ -780,73 +1215,9 @@ export default function App() {
                 </ScrollReveal>
               </div>
 
-              {/* Right Column (5 Cols): Large Editorial Portrait Composition (Responsive on Android & Desktop) */}
-              <div className="lg:col-span-5 order-1 lg:order-2 max-w-md mx-auto lg:max-w-none w-full">
-                <ScrollReveal delay={120}>
-                  <div className="relative border border-[#263B59] bg-[#101E33] overflow-hidden group">
-                    {/* Top Technical Frame Header */}
-                    <div className="px-4 py-2.5 sm:py-3 border-b border-[#263B59] bg-[#0A1424]/90 flex items-center justify-between font-mono text-[10px] tracking-[0.18em] text-[#94A3B8]">
-                      <span className="flex items-center gap-2">
-                        <span className="w-2 h-2 rounded-full bg-[#3B82F6]" />
-                        <span>PORTRAIT // EVAN.PRASETYA</span>
-                      </span>
-                      <span className="text-[#38BDF8]">USM · FTIK</span>
-                    </div>
-
-                    {/* Editorial Portrait Stage */}
-                    <div className="relative aspect-[4/5] w-full bg-gradient-to-b from-[#152640] via-[#101E33] to-[#0A1424] flex items-end justify-center overflow-hidden">
-                      <div
-                        className="absolute inset-0 opacity-30"
-                        style={{
-                          backgroundImage:
-                            'linear-gradient(to right, #263B59 1px, transparent 1px), linear-gradient(to bottom, #263B59 1px, transparent 1px)',
-                          backgroundSize: '48px 48px',
-                        }}
-                      />
-                      <div
-                        className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-60 sm:w-72 h-60 sm:h-72 rounded-full pointer-events-none"
-                        style={{
-                          background:
-                            'radial-gradient(circle, rgba(59, 130, 246, 0.32) 0%, transparent 70%)',
-                        }}
-                      />
-
-                      {/* Corner Brackets */}
-                      <div className="absolute top-3.5 left-3.5 w-3.5 h-3.5 border-t-2 border-l-2 border-[#60A5FA]/60 z-20" />
-                      <div className="absolute top-3.5 right-3.5 w-3.5 h-3.5 border-t-2 border-r-2 border-[#60A5FA]/60 z-20" />
-                      <div className="absolute bottom-3.5 left-3.5 w-3.5 h-3.5 border-b-2 border-l-2 border-[#60A5FA]/60 z-20" />
-                      <div className="absolute bottom-3.5 right-3.5 w-3.5 h-3.5 border-b-2 border-r-2 border-[#60A5FA]/60 z-20" />
-
-                      {/* User's Actual Cutout Portrait */}
-                      <img
-                        src="/evan-cutout.png"
-                        alt="Alfarell Nabil Evan Prasetya — Mahasiswa Sistem Informasi Universitas Semarang"
-                        className="relative z-10 w-[88%] h-[92%] object-contain object-bottom transition-transform duration-500 group-hover:scale-[1.02] drop-shadow-[0_20px_40px_rgba(5,10,20,0.85)]"
-                        onError={(e) => {
-                          e.currentTarget.src = '/evan-profile.jpg';
-                        }}
-                      />
-
-                      {/* Bottom Editorial Fade Overlay */}
-                      <div className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-[#0A1424] via-[#0A1424]/75 to-transparent z-10 pointer-events-none" />
-
-                      {/* Bottom Overlay Caption */}
-                      <div className="absolute bottom-3.5 inset-x-4 sm:inset-x-5 z-20 flex items-end justify-between gap-2">
-                        <div className="min-w-0">
-                          <p className="font-mono text-[9px] sm:text-[10px] tracking-[0.2em] uppercase text-[#38BDF8]">
-                            S1 SISTEM INFORMASI
-                          </p>
-                          <p className="font-display font-extrabold text-sm sm:text-base text-[#F1F5F9] tracking-tight truncate">
-                            ALFARELL NABIL EVAN PRASETYA
-                          </p>
-                        </div>
-                        <span className="font-mono text-[9px] sm:text-[10px] px-2 py-1 border border-[#263B59] bg-[#0A1424]/90 text-[#94A3B8] shrink-0">
-                          SEMARANG, ID
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </ScrollReveal>
+              {/* Right Column (5 Cols): 3D INTERACTIVE HANGING ID CARD (LANYARD) */}
+              <div className="lg:col-span-5 order-1 lg:order-2 flex items-center justify-center">
+                <HangingIdCard />
               </div>
             </div>
           </div>
@@ -994,7 +1365,6 @@ export default function App() {
                             {spec.description}
                           </p>
 
-                          {/* Elegant Text Labels matching the user's actual projects */}
                           <div className="flex flex-wrap items-center gap-y-2">
                             {spec.skills.map((skill, idx) => (
                               <React.Fragment key={skill}>
@@ -1048,250 +1418,373 @@ export default function App() {
         </section>
 
         {/* =====================================================================
-            02. PROYEK UNGGULAN (4 PROYEK ASLI: WEBGUARD, COBAIN AI, STAND CHILLA, CLEANRIDE)
+            02 & 03. PORTFOLIO SHOWCASE (LAYOUT SESUAI REFERENSI: CENTERED "Portfolio"
+            + 4 PILL TABS: Projects | Certificates | Achievements | Tech Stack
+            + 3-COLUMN CARDS DENGAN 3D MOUSE TILT)
            ===================================================================== */}
         <section
           id="selected"
-          aria-labelledby="selected-heading"
-          className="relative w-full bg-[#0A1424] border-b border-[#263B59] py-16 sm:py-24 lg:py-32 overflow-hidden"
+          aria-labelledby="portfolio-heading"
+          className="relative w-full bg-[#070E1A] border-b border-[#263B59] py-20 sm:py-28 lg:py-32 overflow-hidden"
         >
-          {/* Background Watermark */}
+          {/* Ambient Starry / Blue Radial Glow Backdrop */}
           <div
-            aria-hidden="true"
-            className="pointer-events-none select-none absolute top-8 right-4 sm:right-10 font-display font-black text-[clamp(4rem,15vw,18rem)] uppercase tracking-tighter text-[#F1F5F9]/[0.02] leading-none z-0"
-          >
-            PROYEK
-          </div>
+            className="pointer-events-none absolute top-16 left-1/2 -translate-x-1/2 w-[580px] h-[300px] rounded-full opacity-55 blur-3xl"
+            style={{
+              background:
+                'radial-gradient(circle, rgba(59, 130, 246, 0.25) 0%, rgba(56, 189, 248, 0.08) 55%, transparent 75%)',
+            }}
+          />
 
-          <div className="relative z-10 max-w-[1440px] mx-auto px-4 sm:px-8 md:pl-16 lg:pl-20 lg:pr-12">
-            {/* Section Header */}
+          <div className="relative z-10 max-w-[1380px] mx-auto px-4 sm:px-8 md:pl-16 lg:pl-20 lg:pr-12">
+            {/* Centered Title "Portfolio" + Pill Tab Switcher (Matches Reference Screenshot 3!) */}
             <ScrollReveal>
-              <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 sm:mb-14 lg:mb-20 gap-4 sm:gap-6 pb-6 sm:pb-8 border-b border-[#263B59]">
-                <div>
-                  <div className="font-mono text-[11px] font-bold tracking-[0.25em] text-[#38BDF8] uppercase mb-2.5">
-                    [ 02 . PROYEK ]
-                  </div>
-                  <h2
-                    id="selected-heading"
-                    className="font-display font-black text-[36px] sm:text-[52px] lg:text-[68px] leading-[0.95] tracking-tight uppercase text-[#F1F5F9]"
-                  >
-                    PILIHAN <span className="italic font-normal text-[#60A5FA]">KARYA</span>
-                  </h2>
-                </div>
-                <p className="text-[13px] sm:text-[15px] leading-[1.7] text-[#94A3B8] max-w-[440px]">
-                  Kumpulan pengembangan arsitektur sistem dan aplikasi web Full-Stack. Klik pada
-                  kartu proyek untuk melihat studi kasus, fitur, dan galeri dokumentasi lengkap.
-                </p>
-              </div>
-            </ScrollReveal>
+              <div className="flex flex-col items-center text-center mb-12 sm:mb-16">
+                <span className="font-mono text-[11px] font-bold tracking-[0.25em] text-[#38BDF8] uppercase mb-2">
+                  [ 02 . SHOWCASE ]
+                </span>
+                <h2
+                  id="portfolio-heading"
+                  className="font-display font-extrabold text-[42px] sm:text-[56px] lg:text-[64px] tracking-tight text-white leading-none mb-8"
+                >
+                  Portfolio
+                </h2>
 
-            {/* Large Editorial Project Layout (2-Column Grid) */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 lg:gap-10">
-              {selectedProjects.map((project, idx) => (
-                <ScrollReveal key={project.id} delay={idx * 100}>
-                  <article
-                    onClick={() => setSelectedProject(project)}
-                    className="group relative h-full border border-[#263B59] bg-[#101E33] hover:border-[#3B82F6] transition-colors duration-300 flex flex-col justify-between cursor-pointer overflow-hidden"
-                  >
-                    {/* Top Meta Bar */}
-                    <div className="px-4 sm:px-6 py-3.5 sm:py-4 border-b border-[#263B59] bg-[#0A1424]/70 flex items-center justify-between gap-2">
-                      <div className="flex items-center gap-2 sm:gap-3 min-w-0">
-                        <span className="font-mono text-[11px] sm:text-[12px] font-bold text-[#38BDF8] tracking-widest shrink-0">
-                          [{project.number}]
-                        </span>
-                        <span className="text-[#263B59] shrink-0">/</span>
-                        <span className="font-mono text-[9px] sm:text-[11px] font-semibold uppercase tracking-[0.14em] text-[#94A3B8] truncate">
-                          {project.category}
-                        </span>
-                      </div>
-                      <span className="font-mono text-[10px] sm:text-[11px] text-[#94A3B8] shrink-0">
-                        {project.year}
-                      </span>
-                    </div>
-
-                    {/* Large Project Screenshot */}
-                    <div className="relative aspect-[16/10] w-full overflow-hidden border-b border-[#263B59] bg-[#070E1A]">
-                      <img
-                        src={project.thumbnail}
-                        alt={project.title}
-                        loading="lazy"
-                        className="w-full h-full object-cover object-top opacity-90 group-hover:opacity-100 group-hover:scale-[1.03] transition-all duration-500"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-[#0A1424] via-transparent to-transparent opacity-65" />
-                      <div className="absolute bottom-2.5 right-2.5 px-2.5 py-1 bg-[#0A1424]/90 border border-[#263B59] font-mono text-[9px] sm:text-[10px] font-bold text-[#38BDF8] uppercase tracking-wider">
-                        {project.gallery.length} DOKUMENTASI FOTO
-                      </div>
-                    </div>
-
-                    {/* Editorial Project Details */}
-                    <div className="p-5 sm:p-8 flex-1 flex flex-col justify-between space-y-5 sm:space-y-6">
-                      <div className="space-y-2.5 sm:space-y-3">
-                        <p className="font-mono text-[10px] sm:text-[11px] font-bold text-[#60A5FA] tracking-[0.12em] uppercase">
-                          {project.tags.join('  ·  ')}
-                        </p>
-                        <h3 className="font-display font-black text-[20px] sm:text-[26px] leading-[1.15] tracking-tight text-[#F1F5F9] group-hover:text-[#38BDF8] transition-colors">
-                          {project.title}
-                        </h3>
-                        <p className="text-[13px] sm:text-[15px] text-[#94A3B8] leading-[1.7]">
-                          {project.shortDesc}
-                        </p>
-                      </div>
-
-                      {/* View Case Study Action & GitHub Link */}
-                      <div className="pt-4 border-t border-[#263B59]/70 flex items-center justify-between gap-2">
-                        <span className="inline-flex items-center gap-2 font-mono text-[10px] sm:text-[11px] font-bold tracking-[0.16em] uppercase text-[#F1F5F9] group-hover:text-[#38BDF8] transition-colors">
-                          <span>BUKA DETAIL &amp; DOKUMENTASI</span>
-                          <span className="transition-transform group-hover:translate-x-1">→</span>
-                        </span>
-                        <a
-                          href={project.githubUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          onClick={(e) => e.stopPropagation()}
-                          title="Lihat Repositori GitHub"
-                          className="p-2 border border-[#263B59] bg-[#0A1424] hover:bg-[#3B82F6] hover:border-[#60A5FA] text-[#94A3B8] hover:text-[#0A1424] transition-colors shrink-0"
-                        >
-                          <GithubIcon className="w-4 h-4" />
-                        </a>
-                      </div>
-                    </div>
-
-                    {/* Bottom Blue Highlight Line on Hover */}
-                    <div className="h-[2px] w-full bg-[#3B82F6] opacity-0 group-hover:opacity-100 transition-opacity" />
-                  </article>
-                </ScrollReveal>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* =====================================================================
-            03. SERTIFIKAT & KREDENSIAL (3 SERTIFIKAT ASLI HIMMATISI)
-           ===================================================================== */}
-        <section
-          id="credentials"
-          aria-labelledby="credentials-heading"
-          className="relative w-full bg-[#101E33] border-b border-[#263B59] py-16 sm:py-24 lg:py-32 overflow-hidden"
-        >
-          {/* Watermark */}
-          <div
-            aria-hidden="true"
-            className="pointer-events-none select-none absolute top-8 right-4 sm:right-10 font-display font-black text-[clamp(3.5rem,13vw,16rem)] uppercase tracking-tighter text-[#F1F5F9]/[0.02] leading-none z-0"
-          >
-            SERTIFIKAT
-          </div>
-
-          <div className="relative z-10 max-w-[1440px] mx-auto px-4 sm:px-8 md:pl-16 lg:pl-20 lg:pr-12">
-            {/* Section Header */}
-            <ScrollReveal>
-              <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 sm:mb-14 lg:mb-16 gap-4 sm:gap-6 pb-6 sm:pb-8 border-b border-[#263B59]">
-                <div>
-                  <div className="font-mono text-[11px] font-bold tracking-[0.25em] text-[#38BDF8] uppercase mb-2.5">
-                    [ 03 . SERTIFIKAT ]
-                  </div>
-                  <h2
-                    id="credentials-heading"
-                    className="font-display font-black text-[34px] sm:text-[50px] lg:text-[64px] leading-[0.95] tracking-tight uppercase text-[#F1F5F9]"
-                  >
-                    SERTIFIKAT &amp;{' '}
-                    <span className="italic font-normal text-[#60A5FA]">APRESIASI</span>
-                  </h2>
-                </div>
-
-                {/* Navigation Controls */}
-                <div className="flex items-center gap-3">
-                  <button
-                    type="button"
-                    onClick={handlePrevCert}
-                    className="w-10 h-10 sm:w-11 sm:h-11 border border-[#263B59] bg-[#0A1424] hover:bg-[#3B82F6] hover:border-[#60A5FA] text-[#F1F5F9] hover:text-[#0A1424] flex items-center justify-center transition-colors cursor-pointer"
-                    aria-label="Sertifikat Sebelumnya"
-                  >
-                    <ChevronLeft className="w-4 h-4" />
-                  </button>
-                  <button
-                    type="button"
-                    onClick={handleNextCert}
-                    className="w-10 h-10 sm:w-11 sm:h-11 border border-[#263B59] bg-[#0A1424] hover:bg-[#3B82F6] hover:border-[#60A5FA] text-[#F1F5F9] hover:text-[#0A1424] flex items-center justify-center transition-colors cursor-pointer"
-                    aria-label="Sertifikat Berikutnya"
-                  >
-                    <ChevronRight className="w-4 h-4" />
-                  </button>
-                </div>
-              </div>
-            </ScrollReveal>
-
-            {/* 3 Authentic HIMMATISI Certificates Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-7">
-              {credentialsList.map((cred, index) => {
-                const isFocused = index === activeCertIndex;
-                return (
-                  <ScrollReveal key={cred.id} delay={index * 100}>
-                    <div
-                      onClick={() => {
-                        setActiveCertIndex(index);
-                        setSelectedCertificate(cred);
-                      }}
-                      className={`group h-full border p-5 sm:p-7 flex flex-col justify-between transition-all duration-300 cursor-pointer ${isFocused
-                        ? 'bg-[#152640] border-[#3B82F6] shadow-[0_16px_40px_rgba(5,10,20,0.65)]'
-                        : 'bg-[#0A1424] border-[#263B59] hover:border-[#60A5FA]'
+                {/* Rounded Pill Tab Container: Projects | Certificates | Achievements | Tech Stack */}
+                <div className="inline-flex flex-wrap items-center justify-center gap-1.5 sm:gap-2 p-1.5 sm:p-2 rounded-2xl bg-[#0D1627]/95 border border-white/10 shadow-[0_12px_36px_rgba(0,0,0,0.65)]">
+                  {[
+                    {
+                      id: 'projects',
+                      label: 'Projects',
+                      icon: Code2,
+                      count: selectedProjects.length,
+                    },
+                    {
+                      id: 'certificates',
+                      label: 'Certificates',
+                      icon: Award,
+                      count: credentialsList.length,
+                    },
+                    {
+                      id: 'achievements',
+                      label: 'Achievements',
+                      icon: Trophy,
+                      count: 3,
+                    },
+                    {
+                      id: 'techstack',
+                      label: 'Tech Stack',
+                      icon: Cpu,
+                      count: techStackGrid.length,
+                    },
+                  ].map((tab) => {
+                    const Icon = tab.icon;
+                    const isActive = portfolioTab === tab.id;
+                    return (
+                      <button
+                        key={tab.id}
+                        type="button"
+                        onClick={() => setPortfolioTab(tab.id)}
+                        className={`flex items-center gap-2 px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl font-display font-bold text-xs sm:text-sm transition-all duration-250 cursor-pointer ${
+                          isActive
+                            ? 'bg-gradient-to-r from-[#2563EB] to-[#3B82F6] text-white shadow-[0_6px_22px_rgba(37,99,235,0.5)]'
+                            : 'text-[#94A3B8] hover:text-white hover:bg-white/[0.04]'
                         }`}
+                      >
+                        <Icon className="w-4 h-4" />
+                        <span>{tab.label}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            </ScrollReveal>
+
+            {/* TAB 1: PROJECTS (3-Column Rounded Dark Blue Cards matching Reference Image!) */}
+            {portfolioTab === 'projects' && (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-7">
+                {selectedProjects.map((project, idx) => (
+                  <ScrollReveal key={project.id} delay={idx * 90}>
+                    <Interactive3DCard
+                      onClick={() => setSelectedProject(project)}
+                      className="group h-full rounded-[20px] p-4 sm:p-5 bg-[#0D1627]/95 border border-white/15 hover:border-[#3B82F6]/80 shadow-[0_14px_40px_rgba(0,0,0,0.65)] flex flex-col justify-between cursor-pointer overflow-hidden"
                     >
+                      {/* Top Glowing Rim Accent */}
+                      <div className="pointer-events-none absolute inset-x-8 top-0 h-[1.5px] bg-gradient-to-r from-transparent via-white/35 to-transparent" />
+
                       <div>
-                        {/* Top Issuing Organization & Year */}
-                        <div className="flex items-center justify-between border-b border-[#263B59] pb-3.5 mb-4 gap-2">
-                          <span className="font-mono text-[9px] sm:text-[10px] font-bold tracking-[0.14em] uppercase text-[#38BDF8] truncate">
-                            {cred.organization}
-                          </span>
-                          <span className="font-mono text-[10px] sm:text-[11px] text-[#94A3B8] shrink-0">
-                            {cred.year}
-                          </span>
+                        {/* Framed Project Screenshot Inside Card */}
+                        <div className="relative aspect-[16/10] w-full rounded-[13px] overflow-hidden bg-[#060B14] border border-white/10 mb-5">
+                          <img
+                            src={project.thumbnail}
+                            alt={project.title}
+                            loading="lazy"
+                            className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-[#0D1627]/75 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-between p-3">
+                            <span className="px-2.5 py-1 rounded-md bg-[#0A1424]/90 border border-[#38BDF8]/40 font-mono text-[10px] font-bold text-[#38BDF8]">
+                              {project.gallery.length} Dokumentasi Foto
+                            </span>
+                          </div>
                         </div>
 
-                        {/* Authentic Certificate Image Preview */}
-                        <div className="relative w-full aspect-[4/3] bg-[#070E1A] border border-[#263B59] overflow-hidden my-2">
+                        {/* Project Title & Description (Matches Reference Layout) */}
+                        <div className="px-1 space-y-2.5">
+                          <div className="flex items-center justify-between text-[10px] font-mono text-[#38BDF8] uppercase tracking-wider">
+                            <span>{project.category}</span>
+                            <span className="text-[#94A3B8]">{project.year}</span>
+                          </div>
+
+                          <h3 className="font-display font-extrabold text-[19px] sm:text-[21px] text-white group-hover:text-[#60A5FA] transition-colors leading-snug">
+                            {project.title}
+                          </h3>
+
+                          <p className="text-[13px] sm:text-[14px] text-[#94A3B8] leading-relaxed line-clamp-3">
+                            {project.shortDesc}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Tech Stack Tags & Detail Trigger Footer */}
+                      <div className="px-1 pt-5 mt-5 border-t border-white/10 flex flex-col gap-3.5">
+                        <div className="flex flex-wrap gap-1.5">
+                          {project.tags.map((tag, tIdx) => (
+                            <span
+                              key={tIdx}
+                              className="text-[11px] font-mono px-2.5 py-1 rounded-md bg-[#15243D] border border-white/10 text-[#E2E8F0]"
+                            >
+                              {tag}
+                            </span>
+                          ))}
+                        </div>
+
+                        <div className="flex items-center justify-between pt-1">
+                          <span className="font-display font-bold text-xs text-[#38BDF8] group-hover:text-white transition-colors inline-flex items-center gap-1.5">
+                            <span>Lihat Detail &amp; Studi Kasus</span>
+                            <ArrowUpRight className="w-3.5 h-3.5" />
+                          </span>
+                          <a
+                            href={project.githubUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            onClick={(e) => e.stopPropagation()}
+                            title="Lihat Repositori GitHub"
+                            className="p-2 rounded-lg bg-white/5 hover:bg-[#3B82F6] border border-white/10 text-[#94A3B8] hover:text-white transition-colors"
+                          >
+                            <GithubIcon className="w-3.5 h-3.5" />
+                          </a>
+                        </div>
+                      </div>
+                    </Interactive3DCard>
+                  </ScrollReveal>
+                ))}
+              </div>
+            )}
+
+            {/* TAB 2: CERTIFICATES (3-Column 3D Interactive Certificate Cards) */}
+            {portfolioTab === 'certificates' && (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-7">
+                {credentialsList.map((cred, index) => (
+                  <ScrollReveal key={cred.id} delay={index * 90}>
+                    <Interactive3DCard
+                      onClick={() => setSelectedCertificate(cred)}
+                      className="group h-full rounded-[20px] p-4 sm:p-5 bg-[#0D1627]/95 border border-white/15 hover:border-[#38BDF8]/80 shadow-[0_14px_40px_rgba(0,0,0,0.65)] flex flex-col justify-between cursor-pointer overflow-hidden"
+                    >
+                      <div className="pointer-events-none absolute inset-x-8 top-0 h-[1.5px] bg-gradient-to-r from-transparent via-[#38BDF8]/45 to-transparent" />
+
+                      <div>
+                        {/* Framed Certificate Preview */}
+                        <div className="relative aspect-[4/3] w-full rounded-[13px] overflow-hidden bg-[#060B14] border border-white/10 mb-5">
                           <img
                             src={cred.previewImage}
                             alt={cred.title}
                             loading="lazy"
                             className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
                           />
-                          <div className="absolute inset-0 bg-gradient-to-t from-[#0A1424]/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-between p-3">
-                            <span className="font-mono text-[9px] sm:text-[10px] font-bold text-[#F1F5F9] bg-[#0A1424]/90 border border-[#3B82F6] px-2.5 py-1">
-                              KLIK UNTUK PERBESAR
+                          <div className="absolute inset-0 bg-gradient-to-t from-[#060C17]/75 via-[#060C17]/25 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center">
+                            <span className="w-11 h-11 rounded-full bg-white/15 backdrop-blur-md border border-white/30 text-white flex items-center justify-center shadow-[0_8px_24px_rgba(0,0,0,0.45)] scale-90 group-hover:scale-100 transition-transform duration-300">
+                              <ZoomIn className="w-5 h-5 text-[#38BDF8]" />
                             </span>
                           </div>
                         </div>
-                      </div>
 
-                      {/* Bottom Title, Role & View Certificate Action */}
-                      <div className="mt-4 pt-4 border-t border-[#263B59]/60 space-y-3.5">
-                        <div>
-                          <span className="font-mono text-[9px] sm:text-[10px] text-[#60A5FA] uppercase tracking-widest block mb-1">
-                            {cred.category} · {cred.date}
-                          </span>
-                          <h3 className="font-display font-extrabold text-[16px] sm:text-[18px] leading-snug text-[#F1F5F9] group-hover:text-[#38BDF8] transition-colors">
+                        <div className="px-1 space-y-2">
+                          <div className="flex items-center justify-between text-[10px] font-mono text-[#38BDF8] uppercase tracking-wider">
+                            <span>{cred.organization}</span>
+                            <span className="text-[#94A3B8]">{cred.year}</span>
+                          </div>
+
+                          <h3 className="font-display font-extrabold text-[18px] sm:text-[20px] text-white group-hover:text-[#38BDF8] transition-colors leading-snug">
                             {cred.title}
                           </h3>
-                          <p className="font-mono text-[10px] sm:text-[11px] text-[#94A3B8] mt-1">
-                            No: {cred.code}
+
+                          <p className="text-xs sm:text-[13px] text-[#94A3B8] leading-relaxed line-clamp-2">
+                            {cred.description}
                           </p>
                         </div>
+                      </div>
 
-                        <div className="flex items-center justify-between pt-1">
-                          <span className="font-mono text-[10px] sm:text-[11px] font-bold tracking-[0.16em] uppercase text-[#F1F5F9] group-hover:text-[#38BDF8] flex items-center gap-1.5">
-                            <span>LIHAT SERTIFIKAT</span>
-                            <span>↗</span>
+                      <div className="px-1 pt-4 mt-5 border-t border-white/10 flex items-center justify-between">
+                        <span className="font-mono text-[10px] text-[#94A3B8]">
+                          No: {cred.code}
+                        </span>
+                        <span className="font-mono text-[10px] text-emerald-400 font-bold">
+                          TERVERIFIKASI ✓
+                        </span>
+                      </div>
+                    </Interactive3DCard>
+                  </ScrollReveal>
+                ))}
+              </div>
+            )}
+
+            {/* TAB 3: ACHIEVEMENTS & HIGHLIGHTS */}
+            {portfolioTab === 'achievements' && (
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-7">
+                {[
+                  {
+                    badge: 'CAPAIAN AKADEMIK',
+                    title: 'IPK Akademik 3.75 / 4.00',
+                    org: 'S1 Sistem Informasi — Universitas Semarang',
+                    desc: 'Mempertahankan capaian akademik tinggi pada Program Studi S1 Sistem Informasi FTIK Universitas Semarang sembari aktif membangun berbagai proyek rekayasa perangkat lunak.',
+                  },
+                  {
+                    badge: 'KEPANITIAAN & ORGANISASI',
+                    title: 'Anggota Divisi Media — TISI INSIGHT 2026',
+                    org: 'HIMMATISI FTIK Universitas Semarang',
+                    desc: 'Dipercaya menjadi Anggota Divisi Media dalam mendukung publikasi, dokumentasi visual, dan kelancaran kegiatan seminar teknologi informasi TISI INSIGHT 2026.',
+                  },
+                  {
+                    badge: 'PRODUK & REKAYASA SISTEM',
+                    title: '4+ Aplikasi Web Full-Stack & AI',
+                    org: 'WebGuard · Cobain AI Studio · Stand Chilla · CleanRide',
+                    desc: 'Merancang dan mengimplementasikan sistem terintegrasi mulai dari pemindai keamanan URL real-time, studio Virtual Try-On berbasis WebRTC & AI, hingga katalog e-commerce.',
+                  },
+                ].map((ach, idx) => (
+                  <ScrollReveal key={ach.title} delay={idx * 90}>
+                    <Interactive3DCard className="h-full rounded-[20px] p-6 sm:p-7 bg-[#0D1627]/95 border border-white/15 hover:border-[#3B82F6] shadow-[0_14px_40px_rgba(0,0,0,0.65)] flex flex-col justify-between space-y-5">
+                      <div className="space-y-3">
+                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-[#2563EB]/20 border border-[#3B82F6]/40 font-mono text-[10px] font-bold text-[#38BDF8]">
+                          <Sparkles className="w-3.5 h-3.5" />
+                          <span>{ach.badge}</span>
+                        </span>
+                        <h3 className="font-display font-extrabold text-xl text-white">
+                          {ach.title}
+                        </h3>
+                        <p className="font-mono text-xs text-[#60A5FA]">{ach.org}</p>
+                        <p className="text-sm text-[#94A3B8] leading-relaxed">{ach.desc}</p>
+                      </div>
+                      <div className="pt-3 border-t border-white/10 flex items-center justify-between font-mono text-[11px] text-[#38BDF8]">
+                        <span>EVAN PRASETYA</span>
+                        <span>[0{idx + 1}]</span>
+                      </div>
+                    </Interactive3DCard>
+                  </ScrollReveal>
+                ))}
+              </div>
+            )}
+
+            {/* TAB 4: TECH STACK */}
+            {portfolioTab === 'techstack' && (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+                {techStackGrid.map((tech, idx) => (
+                  <ScrollReveal key={tech.name} delay={idx * 45}>
+                    <Interactive3DCard className="rounded-[18px] p-5 bg-[#0D1627]/95 border border-white/15 hover:border-[#38BDF8] shadow-[0_10px_30px_rgba(0,0,0,0.5)] flex flex-col justify-between space-y-3">
+                      <div className="flex items-center justify-between">
+                        <span className="font-mono text-[10px] uppercase tracking-wider text-[#38BDF8]">
+                          {tech.category}
+                        </span>
+                        <span className="w-2 h-2 rounded-full bg-[#3B82F6] shadow-[0_0_10px_#3B82F6]" />
+                      </div>
+                      <h3 className="font-display font-extrabold text-lg text-white">
+                        {tech.name}
+                      </h3>
+                      <span className="font-mono text-[11px] text-[#94A3B8] pt-2 border-t border-white/10">
+                        {tech.badge}
+                      </span>
+                    </Interactive3DCard>
+                  </ScrollReveal>
+                ))}
+              </div>
+            )}
+
+            {/* =================================================================
+                DEDICATED 3D CERTIFICATE SHOWCASE ROW (ALWAYS VISIBLE BELOW PROJECTS
+                OR WHEN BROWSING SO CERTIFICATES ARE PROMINENT WITH 3D TILT)
+               ================================================================= */}
+            {portfolioTab === 'projects' && (
+              <div id="credentials" className="mt-24 pt-16 border-t border-[#263B59]/80">
+                <ScrollReveal>
+                  <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-4">
+                    <div>
+                      <div className="font-mono text-[11px] font-bold tracking-[0.25em] text-[#38BDF8] uppercase mb-2">
+                        [ 03 . SERTIFIKASI &amp; APRESIASI ]
+                      </div>
+                      <h3 className="font-display font-extrabold text-[28px] sm:text-[38px] text-white tracking-tight">
+                        Sertifikat Organisasi &amp; Kepanitiaan
+                      </h3>
+                    </div>
+                    <p className="text-xs sm:text-sm text-[#94A3B8] max-w-md">
+                      Arahkan kursor (mouse) pada kartu sertifikat untuk melihat efek 3D interaktif,
+                      atau klik untuk memperbesar dokumen sertifikat asli.
+                    </p>
+                  </div>
+                </ScrollReveal>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-7">
+                  {credentialsList.map((cred, index) => (
+                    <ScrollReveal key={cred.id} delay={index * 100}>
+                      <Interactive3DCard
+                        onClick={() => setSelectedCertificate(cred)}
+                        className="group h-full rounded-[20px] p-4 sm:p-5 bg-[#0D1627]/95 border border-white/15 hover:border-[#38BDF8]/80 shadow-[0_14px_40px_rgba(0,0,0,0.65)] flex flex-col justify-between cursor-pointer overflow-hidden"
+                      >
+                        <div className="pointer-events-none absolute inset-x-8 top-0 h-[1.5px] bg-gradient-to-r from-transparent via-[#38BDF8]/45 to-transparent" />
+
+                        <div>
+                          <div className="relative aspect-[4/3] w-full rounded-[13px] overflow-hidden bg-[#060B14] border border-white/10 mb-4">
+                            <img
+                              src={cred.previewImage}
+                              alt={cred.title}
+                              loading="lazy"
+                              className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-t from-[#0D1627]/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-between p-3">
+                              <span className="px-2.5 py-1 rounded-md bg-[#0A1424]/90 border border-[#38BDF8] font-mono text-[10px] font-bold text-white">
+                                Klik untuk Memperbesar
+                              </span>
+                            </div>
+                          </div>
+
+                          <div className="px-1 space-y-2">
+                            <div className="flex items-center justify-between text-[10px] font-mono text-[#38BDF8] uppercase tracking-wider">
+                              <span>{cred.organization}</span>
+                              <span className="text-[#94A3B8]">{cred.year}</span>
+                            </div>
+
+                            <h4 className="font-display font-extrabold text-[17px] sm:text-[19px] text-white group-hover:text-[#38BDF8] transition-colors leading-snug">
+                              {cred.title}
+                            </h4>
+
+                            <p className="text-xs text-[#94A3B8] leading-relaxed line-clamp-2">
+                              {cred.description}
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="px-1 pt-4 mt-4 border-t border-white/10 flex items-center justify-between">
+                          <span className="font-mono text-[10px] text-[#94A3B8]">
+                            No: {cred.code}
                           </span>
-                          <span className="font-mono text-[10px] text-emerald-400 font-semibold">
+                          <span className="font-mono text-[10px] text-emerald-400 font-bold">
                             TERVERIFIKASI ✓
                           </span>
                         </div>
-                      </div>
-                    </div>
-                  </ScrollReveal>
-                );
-              })}
-            </div>
+                      </Interactive3DCard>
+                    </ScrollReveal>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </section>
 
@@ -1480,10 +1973,10 @@ export default function App() {
 
                       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
                         {credentialsList.map((cert) => (
-                          <div
+                          <Interactive3DCard
                             key={cert.id}
                             onClick={() => setSelectedCertificate(cert)}
-                            className="group/cert border border-[#263B59] bg-[#0A1424] hover:border-[#38BDF8] transition-colors cursor-pointer overflow-hidden flex flex-col justify-between"
+                            className="group/cert rounded-xl border border-[#263B59] bg-[#0A1424] hover:border-[#38BDF8] transition-colors cursor-pointer overflow-hidden flex flex-col justify-between"
                           >
                             <div className="aspect-[4/3] w-full overflow-hidden bg-[#070E1A] relative">
                               <img
@@ -1501,7 +1994,7 @@ export default function App() {
                                 {cert.title}
                               </p>
                             </div>
-                          </div>
+                          </Interactive3DCard>
                         ))}
                       </div>
                     </div>
@@ -1553,11 +2046,11 @@ export default function App() {
               </div>
             </ScrollReveal>
 
-            {/* Minimal Contact Information Grid */}
+            {/* Minimal Contact Information Grid (Balanced 2-Column Layout without Local Time) */}
             <ScrollReveal delay={120}>
-              <div className="border-t border-[#263B59] pt-10 sm:pt-12 lg:pt-16 grid grid-cols-1 md:grid-cols-12 gap-8 sm:gap-10 lg:gap-12 items-start">
-                {/* Column 1 (4 Cols): Social Links */}
-                <div className="md:col-span-4 flex flex-col">
+              <div className="border-t border-[#263B59] pt-10 sm:pt-12 lg:pt-16 grid grid-cols-1 md:grid-cols-12 gap-8 sm:gap-12 items-start">
+                {/* Column 1 (6 Cols): Social Links */}
+                <div className="md:col-span-6 flex flex-col">
                   <h3 className="font-mono text-[11px] font-bold tracking-[0.22em] text-[#38BDF8] uppercase mb-4 sm:mb-6">
                     MEDIA SOSIAL &amp; REPOSITORI
                   </h3>
@@ -1607,27 +2100,27 @@ export default function App() {
                   </div>
                 </div>
 
-                {/* Column 2 (5 Cols): Contact Details & Availability */}
-                <div className="md:col-span-5 flex flex-col">
+                {/* Column 2 (6 Cols): Contact Details & Availability */}
+                <div className="md:col-span-6 flex flex-col">
                   <h3 className="font-mono text-[11px] font-bold tracking-[0.22em] text-[#38BDF8] uppercase mb-4 sm:mb-6">
                     INFORMASI KONTAK LANGSUNG
                   </h3>
-                  <div className="space-y-5 sm:space-y-6">
+                  <div className="p-6 sm:p-7 rounded-2xl border border-[#263B59] bg-[#101E33]/75 space-y-6">
                     <div>
-                      <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#94A3B8] block mb-1">
+                      <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#94A3B8] block mb-1.5">
                         EMAIL LANGSUNG
                       </span>
                       <a
                         href="mailto:evansprasetyaa@gmail.com?subject=Diskusi%20Proyek%20%2F%20Tawaran%20Kolaborasi%20-%20Portfolio%20Evan"
-                        className="font-display font-extrabold text-[17px] sm:text-[22px] text-[#F1F5F9] hover:text-[#38BDF8] transition-colors tracking-tight block break-all"
+                        className="font-display font-extrabold text-[18px] sm:text-[24px] text-[#F1F5F9] hover:text-[#38BDF8] transition-colors tracking-tight block break-all"
                       >
                         evansprasetyaa@gmail.com
                       </a>
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 sm:gap-6 pt-1">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 pt-4 border-t border-[#263B59]/70">
                       <div>
-                        <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#94A3B8] block mb-1">
+                        <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#94A3B8] block mb-1.5">
                           KETERSEDIAAN
                         </span>
                         <p className="font-mono text-[12px] font-bold uppercase tracking-widest text-emerald-400 flex items-center gap-2">
@@ -1637,7 +2130,7 @@ export default function App() {
                       </div>
 
                       <div>
-                        <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#94A3B8] block mb-1">
+                        <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#94A3B8] block mb-1.5">
                           DOMISILI
                         </span>
                         <p className="font-mono text-[12px] sm:text-[13px] font-bold text-[#F1F5F9] tracking-wider flex items-center gap-1.5">
@@ -1645,27 +2138,6 @@ export default function App() {
                           <span>SEMARANG, INDONESIA</span>
                         </p>
                       </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Column 3 (3 Cols): Local Time WIB */}
-                <div className="md:col-span-3 flex flex-col justify-between">
-                  <div>
-                    <h3 className="font-mono text-[11px] font-bold tracking-[0.22em] text-[#38BDF8] uppercase mb-2">
-                      WAKTU LOKAL
-                    </h3>
-                    <span className="font-mono text-[11px] text-[#94A3B8] tracking-wider block mb-3 sm:mb-4">
-                      SEMARANG, ID (WIB)
-                    </span>
-                    <div className="flex items-baseline gap-2.5 py-3 px-4 sm:py-3.5 sm:px-5 border border-[#263B59] bg-[#101E33] w-fit">
-                      <Clock className="w-4 h-4 text-[#38BDF8] self-center mr-1" />
-                      <span className="font-display font-black text-[24px] sm:text-[32px] tracking-tight text-[#F1F5F9] tabular-nums">
-                        {localTime || '12:00:00'}
-                      </span>
-                      <span className="font-mono font-bold text-[12px] text-[#38BDF8] tracking-wider">
-                        WIB
-                      </span>
                     </div>
                   </div>
                 </div>
@@ -1682,7 +2154,7 @@ export default function App() {
         <div className="max-w-[1440px] mx-auto px-4 sm:px-8 md:pl-16 lg:pl-20 lg:pr-12 py-8 flex flex-col sm:flex-row justify-between items-center gap-4 text-center sm:text-left">
           <div className="flex flex-wrap items-center justify-center sm:justify-start gap-3 sm:gap-4">
             <span className="font-display font-extrabold text-sm tracking-tight text-[#F1F5F9]">
-              EVAN<span className="text-[#3B82F6]">.</span>PRASETYA
+              EVAN <span className="text-[#60A5FA]">PRASETYA</span>
             </span>
             <span className="text-[#263B59] hidden sm:inline">|</span>
             <p className="font-mono text-[10px] sm:text-[11px] uppercase tracking-[0.16em] text-[#94A3B8]">
@@ -1705,7 +2177,7 @@ export default function App() {
         >
           <div
             onClick={(e) => e.stopPropagation()}
-            className="w-full max-w-5xl border border-[#263B59] bg-[#101E33] my-auto overflow-hidden shadow-2xl"
+            className="w-full max-w-5xl rounded-2xl border border-[#263B59] bg-[#101E33] my-auto overflow-hidden shadow-2xl"
           >
             {/* Modal Header */}
             <div className="sticky top-0 z-20 bg-[#0A1424] border-b border-[#263B59] px-4 sm:px-8 py-4 sm:py-5 flex items-center justify-between gap-3">
@@ -1722,7 +2194,7 @@ export default function App() {
               <button
                 type="button"
                 onClick={() => setSelectedProject(null)}
-                className="px-3 sm:px-4 py-2 border border-[#263B59] bg-[#101E33] hover:border-[#3B82F6] text-[#F1F5F9] font-mono text-xs font-bold uppercase tracking-wider cursor-pointer flex items-center gap-1.5 shrink-0"
+                className="px-3 sm:px-4 py-2 rounded-lg border border-[#263B59] bg-[#101E33] hover:border-[#3B82F6] text-[#F1F5F9] font-mono text-xs font-bold uppercase tracking-wider cursor-pointer flex items-center gap-1.5 shrink-0"
                 aria-label="Tutup Modal"
               >
                 <span className="hidden sm:inline">TUTUP</span>
@@ -1738,7 +2210,7 @@ export default function App() {
                   {selectedProject.tags.map((tag, idx) => (
                     <span
                       key={idx}
-                      className="px-2.5 sm:px-3 py-1 sm:py-1.5 border border-[#263B59] bg-[#0A1424] font-mono text-[11px] sm:text-xs font-semibold text-[#38BDF8]"
+                      className="px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-lg border border-[#263B59] bg-[#0A1424] font-mono text-[11px] sm:text-xs font-semibold text-[#38BDF8]"
                     >
                       {tag}
                     </span>
@@ -1748,7 +2220,7 @@ export default function App() {
                   href={selectedProject.githubUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center justify-center gap-2.5 bg-[#3B82F6] hover:bg-[#60A5FA] text-[#0A1424] font-mono text-xs font-bold uppercase tracking-wider px-5 py-2.5 transition-colors"
+                  className="inline-flex items-center justify-center gap-2.5 rounded-xl bg-[#3B82F6] hover:bg-[#60A5FA] text-[#0A1424] font-mono text-xs font-bold uppercase tracking-wider px-5 py-2.5 transition-colors"
                 >
                   <GithubIcon className="w-4 h-4" />
                   <span>SOURCE CODE GITHUB</span>
@@ -1760,7 +2232,7 @@ export default function App() {
               {selectedProject.details && (
                 <div className="space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
-                    <div className="border border-[#263B59] bg-[#0A1424]/70 p-4 sm:p-5 space-y-2">
+                    <div className="rounded-xl border border-[#263B59] bg-[#0A1424]/70 p-4 sm:p-5 space-y-2">
                       <h4 className="font-mono text-xs font-bold text-[#38BDF8] uppercase tracking-wider">
                         TANTANGAN (PROBLEM)
                       </h4>
@@ -1768,7 +2240,7 @@ export default function App() {
                         {selectedProject.details.problem}
                       </p>
                     </div>
-                    <div className="border border-[#263B59] bg-[#0A1424]/70 p-4 sm:p-5 space-y-2">
+                    <div className="rounded-xl border border-[#263B59] bg-[#0A1424]/70 p-4 sm:p-5 space-y-2">
                       <h4 className="font-mono text-xs font-bold text-emerald-400 uppercase tracking-wider">
                         SOLUSI (SOLUTION)
                       </h4>
@@ -1788,7 +2260,7 @@ export default function App() {
                         return (
                           <div
                             key={idx}
-                            className="border border-[#263B59] bg-[#0A1424]/50 p-4 space-y-1.5"
+                            className="rounded-xl border border-[#263B59] bg-[#0A1424]/50 p-4 space-y-1.5"
                           >
                             <div className="flex items-center gap-2 text-white text-xs sm:text-sm font-bold">
                               <CheckCircle2 className="w-4 h-4 text-[#38BDF8] shrink-0" />
@@ -1821,7 +2293,7 @@ export default function App() {
                       <div
                         key={idx}
                         onClick={() => setZoomedImage(img)}
-                        className="group border border-[#263B59] bg-[#0A1424] hover:border-[#3B82F6] transition-colors cursor-pointer overflow-hidden flex flex-col justify-between"
+                        className="group rounded-xl border border-[#263B59] bg-[#0A1424] hover:border-[#3B82F6] transition-colors cursor-pointer overflow-hidden flex flex-col justify-between"
                       >
                         <div className="aspect-video w-full overflow-hidden bg-[#050A14] relative">
                           <img
@@ -1829,9 +2301,10 @@ export default function App() {
                             alt={img.caption}
                             className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-300"
                           />
-                          <div className="absolute inset-0 bg-[#0A1424]/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                            <span className="px-4 py-1.5 bg-[#0A1424] border border-[#38BDF8] font-mono text-xs font-bold text-[#F1F5F9]">
-                              PERBESAR GAMBAR
+                          <div className="absolute inset-0 bg-gradient-to-t from-[#060C17]/75 via-[#060C17]/25 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center">
+                            <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/15 backdrop-blur-md border border-white/30 text-white font-display text-xs font-semibold shadow-[0_8px_24px_rgba(0,0,0,0.5)] scale-90 group-hover:scale-100 transition-transform duration-300">
+                              <ZoomIn className="w-4 h-4 text-[#38BDF8]" />
+                              <span>Lihat Layar Penuh</span>
                             </span>
                           </div>
                         </div>
@@ -1863,7 +2336,7 @@ export default function App() {
         >
           <div
             onClick={(e) => e.stopPropagation()}
-            className="w-full max-w-4xl border border-[#3B82F6] bg-[#101E33] overflow-hidden shadow-2xl my-auto"
+            className="w-full max-w-4xl rounded-2xl border border-[#3B82F6] bg-[#101E33] overflow-hidden shadow-2xl my-auto"
           >
             <div className="px-4 sm:px-6 py-4 bg-[#0A1424] border-b border-[#263B59] flex items-center justify-between gap-3">
               <div className="min-w-0">
@@ -1877,7 +2350,7 @@ export default function App() {
               <button
                 type="button"
                 onClick={() => setSelectedCertificate(null)}
-                className="px-3 py-1.5 border border-[#263B59] bg-[#101E33] text-[#F1F5F9] hover:border-[#3B82F6] font-mono text-xs font-bold cursor-pointer flex items-center gap-1.5 shrink-0"
+                className="px-3 py-1.5 rounded-lg border border-[#263B59] bg-[#101E33] text-[#F1F5F9] hover:border-[#3B82F6] font-mono text-xs font-bold cursor-pointer flex items-center gap-1.5 shrink-0"
               >
                 <span className="hidden sm:inline">TUTUP</span>
                 <X className="w-4 h-4" />
@@ -1886,7 +2359,7 @@ export default function App() {
 
             <div className="p-4 sm:p-8 space-y-5 sm:space-y-6">
               {/* Gambar Sertifikat Asli */}
-              <div className="border border-[#263B59] bg-[#070E1A] overflow-hidden flex items-center justify-center max-h-[65vh]">
+              <div className="rounded-xl border border-[#263B59] bg-[#070E1A] overflow-hidden flex items-center justify-center max-h-[65vh]">
                 <img
                   src={selectedCertificate.previewImage}
                   alt={selectedCertificate.title}
@@ -1894,7 +2367,7 @@ export default function App() {
                 />
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 sm:gap-4 bg-[#0A1424] border border-[#263B59] p-4 font-mono text-xs">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 sm:gap-4 rounded-xl bg-[#0A1424] border border-[#263B59] p-4 font-mono text-xs">
                 <div>
                   <span className="text-[10px] text-[#94A3B8] block">PENYELENGGARA</span>
                   <span className="text-[#F1F5F9] font-bold">
@@ -1935,12 +2408,12 @@ export default function App() {
               <button
                 type="button"
                 onClick={() => setZoomedImage(null)}
-                className="px-3 sm:px-4 py-1.5 border border-[#263B59] bg-[#101E33] font-mono text-xs text-[#F1F5F9] cursor-pointer shrink-0"
+                className="px-3 sm:px-4 py-1.5 rounded-lg border border-[#263B59] bg-[#101E33] font-mono text-xs text-[#F1F5F9] cursor-pointer shrink-0"
               >
                 TUTUP [ESC]
               </button>
             </div>
-            <div className="border border-[#263B59] bg-[#0A1424] max-h-[82vh] overflow-hidden flex items-center justify-center">
+            <div className="rounded-xl border border-[#263B59] bg-[#0A1424] max-h-[82vh] overflow-hidden flex items-center justify-center">
               <img
                 src={zoomedImage.src}
                 alt={zoomedImage.caption}
@@ -1961,7 +2434,7 @@ export default function App() {
         >
           <div
             onClick={(e) => e.stopPropagation()}
-            className="w-full max-w-5xl h-[88vh] border border-[#263B59] bg-[#101E33] flex flex-col overflow-hidden shadow-2xl"
+            className="w-full max-w-5xl h-[88vh] rounded-2xl border border-[#263B59] bg-[#101E33] flex flex-col overflow-hidden shadow-2xl"
           >
             <div className="px-4 sm:px-6 py-3.5 sm:py-4 border-b border-[#263B59] bg-[#0A1424] flex flex-wrap items-center justify-between gap-3">
               <div className="min-w-0">
@@ -1977,7 +2450,7 @@ export default function App() {
                 <a
                   href={cvFileUrl}
                   download="CV - Alfarell Nabil Evan Prasetya.pdf"
-                  className="px-3 sm:px-4 py-2 bg-[#3B82F6] hover:bg-[#60A5FA] text-[#0A1424] font-mono text-[10px] sm:text-[11px] font-bold uppercase tracking-wider flex items-center gap-1.5"
+                  className="px-3 sm:px-4 py-2 rounded-lg bg-[#3B82F6] hover:bg-[#60A5FA] text-[#0A1424] font-mono text-[10px] sm:text-[11px] font-bold uppercase tracking-wider flex items-center gap-1.5"
                 >
                   <Download className="w-3.5 h-3.5" />
                   <span>UNDUH PDF</span>
@@ -1986,7 +2459,7 @@ export default function App() {
                   href={cvFileUrl}
                   target="_blank"
                   rel="noreferrer"
-                  className="hidden sm:flex px-4 py-2 border border-[#263B59] bg-[#101E33] hover:border-[#60A5FA] text-[#F1F5F9] font-mono text-[11px] uppercase tracking-wider items-center gap-1.5"
+                  className="hidden sm:flex px-4 py-2 rounded-lg border border-[#263B59] bg-[#101E33] hover:border-[#60A5FA] text-[#F1F5F9] font-mono text-[11px] uppercase tracking-wider items-center gap-1.5"
                 >
                   <ExternalLink className="w-3.5 h-3.5 text-[#38BDF8]" />
                   <span>TAB BARU</span>
@@ -1994,7 +2467,7 @@ export default function App() {
                 <button
                   type="button"
                   onClick={() => setShowCVModal(false)}
-                  className="p-2 border border-[#263B59] bg-[#101E33] text-[#F1F5F9] hover:border-[#3B82F6] cursor-pointer"
+                  className="p-2 rounded-lg border border-[#263B59] bg-[#101E33] text-[#F1F5F9] hover:border-[#3B82F6] cursor-pointer"
                 >
                   <X className="w-4 h-4" />
                 </button>
