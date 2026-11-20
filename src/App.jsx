@@ -70,6 +70,35 @@ export default function App() {
         { src: "/Screenshot 2026-11-13 152800.png", caption: "Panel Raw JSON Inspector untuk Analisis Respons API" }
       ]
     },
+
+{
+      id: 'cobain-ai-studio',
+      title: "Cobain AI Studio — Real-Time Virtual Try-On & Multimodal AI",
+      category: "AI & Full-Stack Web App",
+      year: "2026",
+      thumbnail: "Screenshot (140).png",
+      shortDesc: "Aplikasi web interaktif berbasis Next.js App Router yang mengintegrasikan teknologi Real-Time Video AI (Decart AI SDK) untuk virtual try-on pakaian instan via kamera, didukung asisten cerdas Google Gemini dan generator gambar.",
+      tags: ["Next.js", "TypeScript", "Decart AI SDK", "Google Gemini API", "Tailwind CSS"],
+      githubUrl: "https://github.com/EvanPrasetya",
+      details: {
+        problem: "Belanja pakaian secara online sering menimbulkan keraguan kecocokan visual di tubuh pengguna, sementara pembuatan konsep visual outfit membutuhkan waktu dan keahlian desain khusus.",
+        solution: "Membangun studio virtual berbasis Next.js dengan integrasi WebRTC, Cloudflare Tunnel, dan Decart AI SDK untuk mencoba pakaian secara real-time lewat kamera, dilengkapi asisten multimodal Google Gemini dan generator gambar lookbook instan.",
+        features: [
+          "Real-Time Virtual Try-On Studio: Mencoba berbagai koleksi pakaian dan aksesoris (kaos, hoodie, crewneck Stone Island, topi, hingga kacamata) secara langsung melalui kamera web dengan dukungan WebRTC dan Cloudflare Tunneling.",
+          "Layering & Custom Upload System: Menumpuk beberapa item sekaligus (layering) atau mengunggah foto pakaian pribadi beserta detail warna untuk langsung dicoba di studio virtual.",
+          "Multimodal AI Assistant & Chatbot: Asisten cerdas terintegrasi untuk menjawab pertanyaan umum, memberikan rekomendasi styling outfit, hingga membantu eksplorasi fashion.",
+          "AI Image Generation & Studio Control: Generator gambar berbasis teks untuk menciptakan konsep visual baru serta pengaturan pencahayaan virtual (Ring Light/Flash) untuk mengoptimalkan tangkapan kamera."
+        ]
+      },
+      gallery: [
+        { src: "Screenshot (140).png", caption: "Tampilan Utama Studio & Katalog Koleksi Pakaian" },
+        { src: "Screenshot (141).png", caption: "Modal Upload Pakaian Sendiri dengan Deskripsi Detail Warna" },
+        { src: "Screenshot (142).png", caption: "Hasil Real-Time Virtual Try-On di Kamera (Longsleeve Stussy)" },
+        { src: "Screenshot (143).png", caption: "Panel Cobain AI Assistant (Mode Obrolan Pintar)" },
+        { src: "Screenshot (144).png", caption: "Fitur AI Image Generation untuk Pembuatan Visual Instan" }
+      ]
+    },
+
     {
       id: 'standchilla',
       title: "Stand Chilla — E-Catalog & WhatsApp Commerce",
