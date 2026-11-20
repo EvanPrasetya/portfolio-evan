@@ -2,15 +2,115 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  color-scheme: dark;
+}
+
 html {
   scroll-behavior: smooth;
+  font-family: 'Inter', 'Manrope', system-ui, -apple-system, sans-serif;
+  background-color: #0A1424;
+  color: #F1F5F9;
   font-size: 16px;
+  -webkit-tap-highlight-color: transparent;
 }
 
 body {
-  background-color: #070a12;
-  color: #f1f5f9;
+  background-color: #0A1424;
+  color: #F1F5F9;
   overflow-x: hidden;
   margin: 0;
   padding: 0;
+}
+
+/* Editorial Typography & Display Watermark */
+.font-display {
+  font-family: 'Manrope', 'Inter', system-ui, sans-serif;
+}
+
+.font-mono {
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
+}
+
+/* Hero Giant Backplate Text with Subtle Metallic Blue Shine */
+.text-blue-glow-shine {
+  background: linear-gradient(
+    180deg,
+    rgba(241, 245, 249, 0.16) 0%,
+    rgba(96, 165, 250, 0.08) 55%,
+    rgba(10, 20, 36, 0.02) 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Subtle Editorial Grid Pattern */
+.editorial-grid-bg {
+  background-size: 72px 72px;
+  background-image: 
+    linear-gradient(to right, rgba(38, 59, 89, 0.18) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(38, 59, 89, 0.18) 1px, transparent 1px);
+}
+
+/* Lightweight Hardware-Accelerated Marquee */
+@keyframes editorialMarquee {
+  0% {
+    transform: translate3d(0%, 0, 0);
+  }
+  100% {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+.animate-editorial-marquee {
+  display: flex;
+  width: max-content;
+  animation: editorialMarquee 34s linear infinite;
+  will-change: transform;
+}
+
+.animate-editorial-marquee:hover {
+  animation-play-state: paused;
+}
+
+/* Hardware-Accelerated 60fps Scroll Reveal Animation (No Blur, Super Smooth on Desktop & Android) */
+.scroll-reveal {
+  opacity: 0;
+  transform: translate3d(0, 36px, 0) scale(0.985);
+  transition:
+    opacity 0.75s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.75s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: opacity, transform;
+}
+
+.scroll-reveal.is-visible {
+  opacity: 1;
+  transform: translate3d(0, 0, 0) scale(1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scroll-reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
+
+/* Custom Sleek Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0A1424;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #263B59;
+  border: 2px solid #0A1424;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #3B82F6;
 }
