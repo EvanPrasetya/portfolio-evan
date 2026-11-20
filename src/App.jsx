@@ -446,7 +446,7 @@ export default function App() {
         </div>
 
         <div className="max-w-[1440px] mx-auto px-4 sm:px-8 md:pl-16 lg:px-12 h-16 sm:h-20 flex items-center justify-between">
-          {/* Left: EVAN.DEV Logo */}
+          {/* Left: EVAN.PRASETYA Logo */}
           <a
             href="#profile"
             className="group flex items-center gap-2 focus:outline-none select-none"
@@ -454,7 +454,7 @@ export default function App() {
             <span className="font-display font-extrabold text-[18px] sm:text-[22px] tracking-[-0.03em] text-[#F1F5F9] flex items-center">
               <span>EVAN</span>
               <span className="w-1.5 h-1.5 rounded-full bg-[#3B82F6] inline-block mx-1 shadow-[0_0_10px_#3B82F6]" />
-              <span className="text-[#60A5FA]">DEV</span>
+              <span className="text-[#60A5FA]">PRASETYA</span>
             </span>
           </a>
 
@@ -470,11 +470,10 @@ export default function App() {
                   key={item.id}
                   href={item.href}
                   onClick={() => setActiveNav(item.id)}
-                  className={`relative px-3 lg:px-4 xl:px-5 py-2 font-mono text-[10px] lg:text-[11px] font-semibold tracking-[0.15em] transition-colors duration-200 ${
-                    isActive
+                  className={`relative px-3 lg:px-4 xl:px-5 py-2 font-mono text-[10px] lg:text-[11px] font-semibold tracking-[0.15em] transition-colors duration-200 ${isActive
                       ? 'text-[#F1F5F9] bg-[#152640]'
                       : 'text-[#94A3B8] hover:text-[#F1F5F9] hover:bg-[#152640]/50'
-                  }`}
+                    }`}
                 >
                   <span className="text-[#38BDF8] mr-1">[{item.code}</span>
                   <span>{item.label}]</span>
@@ -789,7 +788,7 @@ export default function App() {
                     <div className="px-4 py-2.5 sm:py-3 border-b border-[#263B59] bg-[#0A1424]/90 flex items-center justify-between font-mono text-[10px] tracking-[0.18em] text-[#94A3B8]">
                       <span className="flex items-center gap-2">
                         <span className="w-2 h-2 rounded-full bg-[#3B82F6]" />
-                        <span>PORTRAIT // EVAN.DEV</span>
+                        <span>PORTRAIT // EVAN.PRASETYA</span>
                       </span>
                       <span className="text-[#38BDF8]">USM · FTIK</span>
                     </div>
@@ -1232,11 +1231,10 @@ export default function App() {
                         setActiveCertIndex(index);
                         setSelectedCertificate(cred);
                       }}
-                      className={`group h-full border p-5 sm:p-7 flex flex-col justify-between transition-all duration-300 cursor-pointer ${
-                        isFocused
+                      className={`group h-full border p-5 sm:p-7 flex flex-col justify-between transition-all duration-300 cursor-pointer ${isFocused
                           ? 'bg-[#152640] border-[#3B82F6] shadow-[0_16px_40px_rgba(5,10,20,0.65)]'
                           : 'bg-[#0A1424] border-[#263B59] hover:border-[#60A5FA]'
-                      }`}
+                        }`}
                     >
                       <div>
                         {/* Top Issuing Organization & Year */}
@@ -1684,7 +1682,7 @@ export default function App() {
         <div className="max-w-[1440px] mx-auto px-4 sm:px-8 md:pl-16 lg:pl-20 lg:pr-12 py-8 flex flex-col sm:flex-row justify-between items-center gap-4 text-center sm:text-left">
           <div className="flex flex-wrap items-center justify-center sm:justify-start gap-3 sm:gap-4">
             <span className="font-display font-extrabold text-sm tracking-tight text-[#F1F5F9]">
-              EVAN<span className="text-[#3B82F6]">.</span>DEV
+              EVAN<span className="text-[#3B82F6]">.</span>PRASETYA
             </span>
             <span className="text-[#263B59] hidden sm:inline">|</span>
             <p className="font-mono text-[10px] sm:text-[11px] uppercase tracking-[0.16em] text-[#94A3B8]">
@@ -1968,7 +1966,7 @@ export default function App() {
             <div className="px-4 sm:px-6 py-3.5 sm:py-4 border-b border-[#263B59] bg-[#0A1424] flex flex-wrap items-center justify-between gap-3">
               <div className="min-w-0">
                 <span className="font-mono text-[9px] sm:text-[10px] font-bold uppercase tracking-[0.18em] text-[#38BDF8] block">
-                  PREVIEW CURRICULUM VITAE // EVAN.DEV
+                  PREVIEW CURRICULUM VITAE // EVAN PRASETYA
                 </span>
                 <h3 className="font-display font-bold text-sm sm:text-lg text-[#F1F5F9] truncate">
                   CV - Alfarell Nabil Evan Prasetya.pdf
