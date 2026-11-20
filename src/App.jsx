@@ -370,12 +370,12 @@ export default function App() {
       },
       gallery: [
         { src: '/1.png', caption: 'Landing Page Utama & Informasi Layanan CleanRide' },
-        { src: '/3.png', caption: 'Tahap 1: Pemilihan Paket Layanan & Kategori Ukuran Kendaraan' },
-        { src: '/4.png', caption: 'Tahap 2: Pengisian Data Pelanggan & Detail Nomor Polisi' },
-        { src: '/5.png', caption: 'Tahap 3: Penjadwalan Tanggal Kedatangan & Slot Jam Pencucian' },
-        { src: '/6.png', caption: 'Tahap 4: Ringkasan Total Biaya & Pemilihan Metode Pembayaran' },
+        { src: '/2.png', caption: 'Tahap 1: Pemilihan Paket Layanan & Kategori Ukuran Kendaraan' },
+        { src: '/3.png', caption: 'Tahap 2: Penjadwalan Tanggal Kedatangan & Slot Jam Pencucian' },
+        { src: '/4.png', caption: 'Tahap 3: Pengisian Data Pelanggan & Detail Nomor Polisi' },
+        { src: '/5.png', caption: 'Tahap 4: Ringkasan Total Biaya & Pemilihan Metode Pembayaran' },
         {
-          src: '/2.png',
+          src: '/6.png',
           caption: 'Halaman Konfirmasi Pesanan Berhasil & Status Menunggu Pembayaran',
         },
       ],
@@ -471,8 +471,8 @@ export default function App() {
                   href={item.href}
                   onClick={() => setActiveNav(item.id)}
                   className={`relative px-3 lg:px-4 xl:px-5 py-2 font-mono text-[10px] lg:text-[11px] font-semibold tracking-[0.15em] transition-colors duration-200 ${isActive
-                      ? 'text-[#F1F5F9] bg-[#152640]'
-                      : 'text-[#94A3B8] hover:text-[#F1F5F9] hover:bg-[#152640]/50'
+                    ? 'text-[#F1F5F9] bg-[#152640]'
+                    : 'text-[#94A3B8] hover:text-[#F1F5F9] hover:bg-[#152640]/50'
                     }`}
                 >
                   <span className="text-[#38BDF8] mr-1">[{item.code}</span>
@@ -1232,8 +1232,8 @@ export default function App() {
                         setSelectedCertificate(cred);
                       }}
                       className={`group h-full border p-5 sm:p-7 flex flex-col justify-between transition-all duration-300 cursor-pointer ${isFocused
-                          ? 'bg-[#152640] border-[#3B82F6] shadow-[0_16px_40px_rgba(5,10,20,0.65)]'
-                          : 'bg-[#0A1424] border-[#263B59] hover:border-[#60A5FA]'
+                        ? 'bg-[#152640] border-[#3B82F6] shadow-[0_16px_40px_rgba(5,10,20,0.65)]'
+                        : 'bg-[#0A1424] border-[#263B59] hover:border-[#60A5FA]'
                         }`}
                     >
                       <div>
