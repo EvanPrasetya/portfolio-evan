@@ -79,7 +79,7 @@ const HangingIdCard = () => {
   const [isDraggingUI, setIsDraggingUI] = useState(false);
 
   // Base vertical distance (px) from top ceiling pivot to card lanyard slot
-  const BASE_STRAP_LEN = 122;
+  const BASE_STRAP_LEN = 84;
 
   const physRef = useRef({
     isDragging: false,
@@ -252,7 +252,7 @@ const HangingIdCard = () => {
       onPointerUp={handlePointerUp}
       onPointerCancel={handlePointerUp}
       onPointerLeave={handlePointerLeave}
-      className="relative w-full h-[510px] sm:h-[560px] flex flex-col items-center justify-start select-none overflow-visible"
+      className="relative w-full h-[460px] sm:h-[510px] flex flex-col items-center justify-start select-none overflow-visible"
       style={{ perspective: '1300px' }}
     >
       {/* Ambient Backlight Glow Behind Hanging ID Card */}
@@ -313,9 +313,8 @@ const HangingIdCard = () => {
           willChange: 'transform',
           touchAction: 'none',
         }}
-        className={`relative z-30 mt-[112px] w-[286px] sm:w-[322px] rounded-[20px] p-2.5 bg-gradient-to-b from-[#17253B] via-[#0B1322] to-[#070C16] border-[2px] ${
-          isDraggingUI ? 'border-[#38BDF8] cursor-grabbing' : 'border-white/20 cursor-grab'
-        } shadow-[0_28px_65px_rgba(0,0,0,0.9),0_0_30px_rgba(59,130,246,0.2)] transition-colors duration-200`}
+        className={`relative z-30 mt-[74px] w-[292px] sm:w-[332px] rounded-[20px] p-2.5 bg-gradient-to-b from-[#17253B] via-[#0B1322] to-[#070C16] border-[2px] ${isDraggingUI ? 'border-[#38BDF8] cursor-grabbing' : 'border-white/20 cursor-grab'
+          } shadow-[0_28px_65px_rgba(0,0,0,0.9),0_0_30px_rgba(59,130,246,0.2)] transition-colors duration-200`}
       >
         {/* Dynamic Glare Overlay */}
         <div
@@ -375,7 +374,7 @@ const HangingIdCard = () => {
           </div>
 
           {/* Center Composition: Ocean Blue Window + Vertical Title + Cutout Photo */}
-          <div className="relative z-10 px-3.5 pt-2 h-[225px] sm:h-[250px] flex items-end justify-center">
+          <div className="relative z-10 px-3.5 pt-2 h-[245px] sm:h-[272px] flex items-end justify-center overflow-hidden">
             <div className="absolute left-3.5 top-3 bottom-4 w-[58%] rounded-[4px] bg-gradient-to-br from-[#0F294A] via-[#153B6B] to-[#0A182E] overflow-hidden border border-[#0E1E38]/30 shadow-inner">
               <div
                 className="absolute inset-0 opacity-30"
@@ -403,7 +402,7 @@ const HangingIdCard = () => {
               src="/evan-cutout.png"
               alt="Alfarell Nabil Evan Prasetya"
               draggable={false}
-              className="relative z-20 h-[106%] w-auto object-contain object-bottom drop-shadow-[0_10px_18px_rgba(10,20,36,0.55)] pointer-events-none select-none"
+              className="relative z-20 h-[118%] sm:h-[120%] w-auto object-contain object-bottom scale-[1.06] origin-bottom drop-shadow-[0_12px_20px_rgba(10,20,36,0.6)] pointer-events-none select-none"
               onError={(e) => {
                 e.currentTarget.src = '/evan-profile.jpg';
               }}
@@ -903,14 +902,12 @@ export default function App() {
                     setActiveNav(item.id);
                     if (item.tab) setPortfolioTab(item.tab);
                   }}
-                  className={`relative px-3 lg:px-4 xl:px-5 py-2 font-mono text-[10px] lg:text-[11px] font-semibold tracking-[0.15em] transition-colors duration-200 ${
-                    isActive
-                      ? 'text-[#F1F5F9] bg-[#152640]'
-                      : 'text-[#94A3B8] hover:text-[#F1F5F9] hover:bg-[#152640]/50'
-                  }`}
+                  className={`relative px-3 lg:px-4 xl:px-5 py-2 font-mono text-[10px] lg:text-[11px] font-semibold tracking-[0.15em] transition-colors duration-200 ${isActive
+                    ? 'text-[#F1F5F9] bg-[#152640]'
+                    : 'text-[#94A3B8] hover:text-[#F1F5F9] hover:bg-[#152640]/50'
+                    }`}
                 >
-                  <span className="text-[#38BDF8] mr-1">[{item.code}</span>
-                  <span>{item.label}]</span>
+                  <span className="tracking-[0.16em]">{item.label}</span>
                   {isActive && (
                     <span className="absolute bottom-0 inset-x-0 h-[2px] bg-[#3B82F6] shadow-[0_0_10px_#3B82F6]" />
                   )}
@@ -965,10 +962,7 @@ export default function App() {
                   }}
                   className="py-3 font-mono text-xs font-bold tracking-[0.18em] text-[#F1F5F9] active:text-[#38BDF8] flex items-center justify-between"
                 >
-                  <span>
-                    <span className="text-[#38BDF8] mr-2">[{item.code}</span>
-                    {item.label}]
-                  </span>
+                  <span>{item.label}</span>
                   <ArrowUpRight className="w-4 h-4 text-[#94A3B8]" />
                 </a>
               ))}
@@ -1094,22 +1088,9 @@ export default function App() {
             </span>
           </div>
 
-          <div className="relative z-10 max-w-[1440px] mx-auto px-4 sm:px-8 md:pl-16 lg:pl-20 lg:pr-12 pt-6 sm:pt-10 pb-14 sm:pb-16 lg:pb-24">
-            {/* Top Editorial Meta Strip */}
-            <ScrollReveal>
-              <div className="flex flex-wrap items-center justify-between gap-3 pb-5 mb-6 lg:mb-10 border-b border-[#263B59]/80">
-                <div className="font-mono text-[10px] sm:text-[12px] font-bold tracking-[0.22em] uppercase text-[#38BDF8]">
-                  [ 01 . PROFIL ]
-                </div>
-                <div className="flex items-center gap-2 font-mono text-[10px] sm:text-[11px] tracking-[0.18em] uppercase text-[#94A3B8]">
-                  <span className="w-2 h-2 rounded-full bg-[#38BDF8]" />
-                  <span>TERSEDIA UNTUK MAGANG &amp; PROYEK</span>
-                </div>
-              </div>
-            </ScrollReveal>
-
+          <div className="relative z-10 max-w-[1440px] mx-auto px-4 sm:px-8 md:pl-16 lg:pl-20 lg:pr-16 pt-4 sm:pt-6 pb-10 sm:pb-14 lg:pb-16">
             {/* Main Editorial Hero Grid: Left Typography + Right 3D Hanging ID Card */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-10 items-center">
               {/* Left Column (7 Cols) */}
               <div className="lg:col-span-7 space-y-6 sm:space-y-8 order-2 lg:order-1">
                 <ScrollReveal delay={80}>
@@ -1173,41 +1154,32 @@ export default function App() {
                   </div>
                 </ScrollReveal>
 
-                {/* Three Highlight Metrics (01, 02, 03) */}
+                {/* Three Highlight Metrics */}
                 <ScrollReveal delay={340}>
-                  <div className="pt-6 border-t border-[#263B59] grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+                  <div className="pt-5 border-t border-[#263B59] grid grid-cols-1 sm:grid-cols-3 gap-3.5">
                     <div className="border border-[#263B59] bg-[#101E33]/90 p-4 hover:border-[#3B82F6] transition-colors">
-                      <div className="font-mono text-[11px] font-bold text-[#38BDF8] tracking-widest">
-                        [01]
-                      </div>
-                      <div className="font-display font-bold text-[14px] sm:text-[15px] text-[#F1F5F9] mt-1">
+                      <div className="font-display font-bold text-[14px] sm:text-[15px] text-[#F1F5F9]">
                         Mahasiswa Sistem Informasi
                       </div>
-                      <div className="font-mono text-[10px] text-[#94A3B8] uppercase tracking-wider mt-0.5">
+                      <div className="font-mono text-[10px] text-[#94A3B8] uppercase tracking-wider mt-1">
                         UNIVERSITAS SEMARANG (IPK 3.75)
                       </div>
                     </div>
 
                     <div className="border border-[#263B59] bg-[#101E33]/90 p-4 hover:border-[#3B82F6] transition-colors">
-                      <div className="font-mono text-[11px] font-bold text-[#38BDF8] tracking-widest">
-                        [02]
-                      </div>
-                      <div className="font-display font-bold text-[14px] sm:text-[15px] text-[#F1F5F9] mt-1">
+                      <div className="font-display font-bold text-[14px] sm:text-[15px] text-[#F1F5F9]">
                         Full-Stack &amp; UI/UX
                       </div>
-                      <div className="font-mono text-[10px] text-[#94A3B8] uppercase tracking-wider mt-0.5">
+                      <div className="font-mono text-[10px] text-[#94A3B8] uppercase tracking-wider mt-1">
                         LARAVEL · REACT · NEXT.JS
                       </div>
                     </div>
 
                     <div className="border border-[#263B59] bg-[#101E33]/90 p-4 hover:border-[#3B82F6] transition-colors">
-                      <div className="font-mono text-[11px] font-bold text-[#38BDF8] tracking-widest">
-                        [03]
-                      </div>
-                      <div className="font-display font-bold text-[14px] sm:text-[15px] text-[#F1F5F9] mt-1">
+                      <div className="font-display font-bold text-[14px] sm:text-[15px] text-[#F1F5F9]">
                         Siap Magang &amp; Kolaborasi
                       </div>
-                      <div className="font-mono text-[10px] text-emerald-400 uppercase tracking-wider mt-0.5">
+                      <div className="font-mono text-[10px] text-emerald-400 uppercase tracking-wider mt-1">
                         TERSEDIA SAAT INI ●
                       </div>
                     </div>
@@ -1485,11 +1457,10 @@ export default function App() {
                         key={tab.id}
                         type="button"
                         onClick={() => setPortfolioTab(tab.id)}
-                        className={`flex items-center gap-2 px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl font-display font-bold text-xs sm:text-sm transition-all duration-250 cursor-pointer ${
-                          isActive
-                            ? 'bg-gradient-to-r from-[#2563EB] to-[#3B82F6] text-white shadow-[0_6px_22px_rgba(37,99,235,0.5)]'
-                            : 'text-[#94A3B8] hover:text-white hover:bg-white/[0.04]'
-                        }`}
+                        className={`flex items-center gap-2 px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl font-display font-bold text-xs sm:text-sm transition-all duration-250 cursor-pointer ${isActive
+                          ? 'bg-gradient-to-r from-[#2563EB] to-[#3B82F6] text-white shadow-[0_6px_22px_rgba(37,99,235,0.5)]'
+                          : 'text-[#94A3B8] hover:text-white hover:bg-white/[0.04]'
+                          }`}
                       >
                         <Icon className="w-4 h-4" />
                         <span>{tab.label}</span>
