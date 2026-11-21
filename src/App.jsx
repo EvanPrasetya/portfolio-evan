@@ -794,6 +794,48 @@ export default function App() {
         },
       ],
     },
+    {
+      id: 'suaraweb',
+      number: '05',
+      title: 'SuaraWeb — Smart Inclusive Web Accessibility Assistant',
+      category: 'SOCIAL TECH & FRONTEND WEB DEVELOPMENT',
+      year: '2026',
+      thumbnail: '/suaraweb-1-tunanetra.png',
+      shortDesc:
+        'SuaraWeb adalah aplikasi web asisten aksesibilitas adaptif yang dirancang untuk membantu penyandang disabilitas netra (tunanetra/low-vision) dan teman tuli (tunarungu) dalam mengakses informasi digital serta berkomunikasi sehari-hari. Memadukan sintesis suara alami (Text-to-Speech), transkripsi ucapan waktu nyata (Speech-to-Text), dan antarmuka adaptif berstandar WCAG AAA.',
+      tags: ['React.js', 'Vite', 'Tailwind CSS', 'Web Speech API', 'WCAG AAA'],
+      githubUrl: 'https://github.com/EvanPrasetya/smart-inclusive-access',
+      details: {
+        problem:
+          'Banyak platform web modern memiliki tingkat kontras warna yang rendah, ukuran huruf yang kaku, serta minim dukungan navigasi suara. Hal ini menyulitkan penyandang low-vision maupun tunanetra saat membaca artikel digital, serta menciptakan hambatan komunikasi tatap muka bagi teman tuli.',
+        solution:
+          'Merancang antarmuka web inklusif yang memisahkan kebutuhan pengguna menjadi dua mode utama: mode Audio-First dengan kontrol perintah suara bebas genggam untuk tunanetra, serta mode Visual-First dengan transkripsi percakapan langsung ke layar berukuran besar untuk teman tuli.',
+        features: [
+          'Mode Tunanetra & Perintah Suara Bebas Genggam (Hands-Free): Dilengkapi pemicu tombol Spasi di keyboard untuk mengaktifkan perintah suara ("Baca teks", "Ringkas", "Kontras tinggi", atau "Perbesar huruf"), serta fitur peringkas poin inti artikel yang langsung dibacakan menggunakan sintesis suara bahasa Indonesia.',
+          'Dynamic High-Contrast & Dyslexia Mode: Toolbar pengaturan instan di bagian atas layar untuk mengubah tema menjadi latar hitam murni dengan teks kuning cerah (High-Contrast Mode), pengaturan skala huruf (A-, Normal, A+), serta mode spasi huruf lega untuk pembaca disleksia.',
+          'Mode Tunarungu & Live Transcriber: Mengubah ucapan lawan bicara melalui mikrofon secara langsung (real-time) menjadi teks berukuran besar di layar, lengkap dengan tombol salin teks serta opsi input ketik/dikte manual.',
+          'Accessible Touch Targets & Papan Komunikasi Cepat: Seluruh tombol kontrol dirancang berukuran besar dengan fokus navigasi keyboard yang jelas, disertai Papan Komunikasi Cepat berbasis kartu frasa layar penuh untuk memudahkan interaksi tatap muka.',
+        ],
+      },
+      gallery: [
+        {
+          src: '/suaraweb-1-tunanetra.png',
+          caption: 'Mode Tunanetra & Low-Vision: Perintah Suara (Spasi) & Teks Ringkasan Pintar',
+        },
+        {
+          src: '/suaraweb-2-kontras.png',
+          caption: 'Dynamic High-Contrast & Dyslexia Mode: Tema Hitam Murni & Teks Kuning Cerah',
+        },
+        {
+          src: '/suaraweb-3-transcriber.png',
+          caption: 'Mode Tunarungu & Teman Tuli: Transkripsi Percakapan Real-Time (Live Transcriber)',
+        },
+        {
+          src: '/suaraweb-4-komunikasi.png',
+          caption: 'Papan Komunikasi Cepat: Kartu Frasa Instan Layar Penuh untuk Interaksi Tatap Muka',
+        },
+      ],
+    },
   ];
 
   // 3 Sertifikat Asli HIMMATISI
@@ -1696,8 +1738,7 @@ export default function App() {
                       </h3>
                     </div>
                     <p className="text-xs sm:text-sm text-[#94A3B8] max-w-md">
-                      Arahkan kursor (mouse) pada kartu sertifikat untuk melihat efek 3D interaktif,
-                      atau klik untuk memperbesar dokumen sertifikat asli.
+
                     </p>
                   </div>
                 </ScrollReveal>
