@@ -642,6 +642,7 @@ export default function App() {
         'Aplikasi web untuk mengotomatisasi proses perapian dan pemformatan dokumen Microsoft Word (.docx) maupun teks/Markdown secara presisi di atas mesin Office Open XML (OOXML) asli agar tetap 100% dapat diedit.',
       tags: ['OOXML', 'DOCX Processing', 'Markdown', 'Web Document Editor'],
       liveUrl: 'https://rapidoc-workspace.vercel.app/',
+      liveUrl: 'https://github.com/EvanPrasetya/RapiDoc.git',
       details: {
         problem:
           'Mengatur margin, jenis font, spasi, penomoran halaman Romawi & Arab, serta daftar isi di Microsoft Word secara manual sering memakan waktu lama dan menghasilkan format yang tidak konsisten pada dokumen akademik maupun profesional.',
