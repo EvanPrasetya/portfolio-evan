@@ -399,12 +399,12 @@ const HangingIdCard = () => {
             </div>
 
             <img
-              src="/evan-cutout.png"
+              src="/profile/evan-cutout.png"
               alt="Alfarell Nabil Evan Prasetya"
               draggable={false}
               className="relative z-20 h-[118%] sm:h-[120%] w-auto object-contain object-bottom scale-[1.06] origin-bottom drop-shadow-[0_12px_20px_rgba(10,20,36,0.6)] pointer-events-none select-none"
               onError={(e) => {
-                e.currentTarget.src = '/evan-profile.jpg';
+                e.currentTarget.src = '/profile/evan-profile.jpg';
               }}
             />
 
@@ -629,15 +629,73 @@ export default function App() {
     },
   ];
 
-  // 4 Projek Portofolio Asli (WebGuard, Cobain AI Studio, Stand Chilla, CleanRide)
+  // 6 Projek Portofolio Asli (RapiDoc di atas, Stand Chilla di bawah)
   const selectedProjects = [
     {
-      id: 'webguard',
+      id: 'rapidoc',
       number: '01',
+      title: 'RapiDoc — Smart Document Formatter',
+      category: 'WEB APPLICATION · DOCUMENT AUTOMATION',
+      year: '2026',
+      thumbnail: '/projects/rapidoc/1-landing.png',
+      shortDesc:
+        'Aplikasi web untuk mengotomatisasi proses perapian dan pemformatan dokumen Microsoft Word (.docx) maupun teks/Markdown secara presisi di atas mesin Office Open XML (OOXML) asli agar tetap 100% dapat diedit.',
+      tags: ['OOXML', 'DOCX Processing', 'Markdown', 'Web Document Editor'],
+      liveUrl: 'https://rapidoc-workspace.vercel.app/',
+      details: {
+        problem:
+          'Mengatur margin, jenis font, spasi, penomoran halaman Romawi & Arab, serta daftar isi di Microsoft Word secara manual sering memakan waktu lama dan menghasilkan format yang tidak konsisten pada dokumen akademik maupun profesional.',
+        solution:
+          'Membangun RapiDoc dengan mesin pemrosesan Office Open XML (OOXML) asli yang mengotomatisasi 12+ aturan pemformatan sekaligus—mendukung unggah file .docx maupun tempel teks/Markdown dari AI—dengan hasil dokumen Word yang tetap 100% editable.',
+        features: [
+          'Pemformatan Otomatis & Audit Format: Mengatur margin A4 (mis. 4-4-3-3 cm), font Times New Roman / Calibri, ukuran teks, spasi baris 1.5, indentasi, dan mendeteksi ketidaksesuaian format per paragraf.',
+          'Pemrosesan DOCX & Markdown AI: Mendukung unggah file .docx (maks. 20 MB) maupun tempel teks biasa/Markdown dari ChatGPT atau Claude untuk langsung dikonversi menjadi dokumen terstruktur.',
+          '9+ Preset Template & Logo Cover Otomatis: Tersedia preset Makalah Kuliah, Skripsi/Tugas Akhir, Laporan Magang/PKL/KKN, Proposal, Surat Resmi, hingga CV ATS-Friendly lengkap dengan penyematan logo instansi/kampus.',
+          'Penomoran Halaman, Word TOC Field & Ekspor Multi-Format: Mendukung Section Break Romawi (i, ii) & Arab (1, 2), Daftar Isi otomatis (Word TOC Field), serta unduhan dalam format .DOCX, .PDF, .HTML, .TXT, dan .MD.',
+        ],
+      },
+      gallery: [
+        {
+          src: '/projects/rapidoc/1-landing.png',
+          caption: 'Halaman Utama RapiDoc: Smart Document Formatter berbasis pemrosesan DOCX nyata',
+        },
+        {
+          src: '/projects/rapidoc/2-ooxml-engine.png',
+          caption: 'Arsitektur Engine OOXML Asli: Manipulasi XML Word (100% Editable) & Audit Format',
+        },
+        {
+          src: '/projects/rapidoc/3-templates.jpg',
+          caption: 'Katalog Preset Template Siap Pakai: Makalah, Skripsi, Laporan Magang, Proposal, Surat & CV ATS',
+        },
+        {
+          src: '/projects/rapidoc/4-upload-docx.png',
+          caption: 'Workspace Unggah Dokumen .DOCX (Drag & Drop) dengan Engine OOXML Aktif',
+        },
+        {
+          src: '/projects/rapidoc/5-template-picker.png',
+          caption: 'Pemilih 9 Jenis Template Dokumen Akademik & Profesional di Workspace',
+        },
+        {
+          src: '/projects/rapidoc/6-paste-markdown.png',
+          caption: 'Mode Tempel Teks / Markdown AI beserta Pengaturan Logo Universitas pada Halaman Cover',
+        },
+        {
+          src: '/projects/rapidoc/7-preview-rules.png',
+          caption: 'Pratinjau Dokumen A4 & Panel 12/12 Aturan Pemformatan (Margin, Font, TOC & Section Break)',
+        },
+        {
+          src: '/projects/rapidoc/8-output-editor.jpg',
+          caption: 'Output Akhir Siap Unduh: Dokumen Makalah Terformat Rapi Lengkap dengan Cover Logo & Ekspor .DOCX/.PDF/.HTML/.MD',
+        },
+      ],
+    },
+    {
+      id: 'webguard',
+      number: '02',
       title: 'WebGuard: Real-Time URL Security Scanner',
       category: 'FULL-STACK WEB DEVELOPMENT',
       year: '2026',
-      thumbnail: '/Screenshot 2026-11-13 152537.png',
+      thumbnail: '/projects/webguard/home.png',
       shortDesc:
         'Aplikasi keamanan web berbasis client-server untuk mendeteksi ancaman malware dan phishing pada tautan (URL) secara real-time terintegrasi API VirusTotal.',
       tags: ['React.js', 'Laravel 11', 'VirusTotal API', 'Tailwind CSS'],
@@ -656,30 +714,30 @@ export default function App() {
       },
       gallery: [
         {
-          src: '/Screenshot 2026-11-13 152537.png',
+          src: '/projects/webguard/home.png',
           caption: 'Halaman Utama & Input Pencarian URL Scanner',
         },
         {
-          src: '/Screenshot 2026-11-13 152518.png',
+          src: '/projects/webguard/safe.png',
           caption: 'Indikator Status Hijau: Tautan Terverifikasi Aman (0 Flagged)',
         },
         {
-          src: '/Screenshot 2026-11-13 152419.png',
+          src: '/projects/webguard/danger.png',
           caption: 'Indikator Status Merah: Peringatan Ancaman Malware Terdeteksi',
         },
         {
-          src: '/Screenshot 2026-11-13 152800.png',
+          src: '/projects/webguard/json-inspector.png',
           caption: 'Panel Raw JSON Inspector untuk Analisis Respons API',
         },
       ],
     },
     {
       id: 'cobain-ai-studio',
-      number: '02',
+      number: '03',
       title: 'Cobain AI Studio — Virtual Try-On & Multimodal AI',
       category: 'AI & FULL-STACK WEB APP',
       year: '2026',
-      thumbnail: '/Screenshot (140).png',
+      thumbnail: '/projects/cobain-ai/studio.png',
       shortDesc:
         'Aplikasi web interaktif berbasis Next.js App Router yang mengintegrasikan teknologi Real-Time Video AI (Decart AI SDK) untuk virtual try-on pakaian instan via kamera, didukung asisten cerdas Google Gemini.',
       tags: ['Next.js', 'TypeScript', 'Decart AI SDK', 'Google Gemini API', 'Tailwind CSS'],
@@ -698,65 +756,24 @@ export default function App() {
       },
       gallery: [
         {
-          src: '/Screenshot (140).png',
+          src: '/projects/cobain-ai/studio.png',
           caption: 'Tampilan Utama Studio & Katalog Koleksi Pakaian',
         },
         {
-          src: '/Screenshot (141).png',
+          src: '/projects/cobain-ai/upload.png',
           caption: 'Modal Upload Pakaian Sendiri dengan Deskripsi Detail Warna',
         },
         {
-          src: '/Screenshot (142).png',
+          src: '/projects/cobain-ai/tryon-result.png',
           caption: 'Hasil Real-Time Virtual Try-On di Kamera (Longsleeve Stussy)',
         },
         {
-          src: '/Screenshot (143).png',
+          src: '/projects/cobain-ai/assistant.png',
           caption: 'Panel Cobain AI Assistant (Mode Obrolan Pintar)',
         },
         {
-          src: '/Screenshot (144).png',
+          src: '/projects/cobain-ai/image-gen.png',
           caption: 'Fitur AI Image Generation untuk Pembuatan Visual Instan',
-        },
-      ],
-    },
-    {
-      id: 'standchilla',
-      number: '03',
-      title: 'Stand Chilla — E-Catalog & WhatsApp Commerce',
-      category: 'FULL-STACK WEB DEVELOPMENT',
-      year: '2026',
-      thumbnail: '/Screenshot (91).png',
-      shortDesc:
-        'Platform katalog digital dan sistem pemesanan suvenir terintegrasi WhatsApp untuk toko ritel di kawasan wisata Klenteng Sam Poo Kong, Semarang.',
-      tags: ['Laravel 11', 'MySQL', 'Vanilla JS', 'REST API'],
-      githubUrl: 'https://github.com/EvanPrasetya',
-      details: {
-        problem:
-          'Pemilik toko suvenir di area wisata kesulitan membagikan daftar harga terbaru dan ketersediaan stok kepada pelanggan jarak jauh maupun pengunjung saat toko sedang ramai.',
-        solution:
-          'Membangun aplikasi web katalog responsif dengan arsitektur decoupled (Laravel RESTful API + Frontend modern) dan fitur Floating Cart yang otomatis menyusun format pesanan ke WhatsApp.',
-        features: [
-          'RESTful API & Admin CRUD (Laravel 11 & MySQL): Memungkinkan pemilik toko memperbarui harga, menambah produk, dan mengatur status stok secara real-time.',
-          'Dynamic Cart & WA Checkout: Kalkulasi subtotal belanja otomatis dengan konversi pesan pesanan siap kirim ke WhatsApp Business.',
-          'Resilient Architecture & UX: Dilengkapi mekanisme local fallback data, integrasi rute lokasi toko, serta animasi scroll reveal.',
-        ],
-      },
-      gallery: [
-        {
-          src: '/Screenshot (91).png',
-          caption: 'Tampilan Hero Katalog Stand Chilla (Mode Layar Penuh)',
-        },
-        {
-          src: '/Screenshot (90).png',
-          caption: 'Tata Letak Tipografi & Navigasi Katalog Produk Suvenir',
-        },
-        {
-          src: '/Screenshot (92).png',
-          caption: 'Drawer Keranjang Suvenir Dinamis & Kalkulasi Estimasi Harga',
-        },
-        {
-          src: '/Screenshot (93).png',
-          caption: 'Dashboard Admin Laravel untuk Input & Manajemen Stok Suvenir',
         },
       ],
     },
@@ -766,7 +783,7 @@ export default function App() {
       title: 'CleanRide – Car Wash Booking System & API',
       category: 'FULL-STACK & BACKEND API',
       year: '2026',
-      thumbnail: '/1.png',
+      thumbnail: '/projects/cleanride/landing.png',
       shortDesc:
         'Sistem reservasi layanan cuci kendaraan terintegrasi dengan alur pemesanan bertahap (multi-step booking), kalkulasi paket layanan, dan backend RESTful API Laravel.',
       tags: ['Laravel', 'PHP', 'MySQL', 'Postman', 'Tailwind CSS'],
@@ -783,13 +800,13 @@ export default function App() {
         ],
       },
       gallery: [
-        { src: '/1.png', caption: 'Landing Page Utama & Informasi Layanan CleanRide' },
-        { src: '/3.png', caption: 'Tahap 1: Pemilihan Paket Layanan & Kategori Ukuran Kendaraan' },
-        { src: '/4.png', caption: 'Tahap 2: Pengisian Data Pelanggan & Detail Nomor Polisi' },
-        { src: '/5.png', caption: 'Tahap 3: Penjadwalan Tanggal Kedatangan & Slot Jam Pencucian' },
-        { src: '/6.png', caption: 'Tahap 4: Ringkasan Total Biaya & Pemilihan Metode Pembayaran' },
+        { src: '/projects/cleanride/landing.png', caption: 'Landing Page Utama & Informasi Layanan CleanRide' },
+        { src: '/projects/cleanride/step-1.png', caption: 'Tahap 1: Pemilihan Paket Layanan & Kategori Ukuran Kendaraan' },
+        { src: '/projects/cleanride/step-2.png', caption: 'Tahap 2: Pengisian Data Pelanggan & Detail Nomor Polisi' },
+        { src: '/projects/cleanride/step-3.png', caption: 'Tahap 3: Penjadwalan Tanggal Kedatangan & Slot Jam Pencucian' },
+        { src: '/projects/cleanride/step-4.png', caption: 'Tahap 4: Ringkasan Total Biaya & Pemilihan Metode Pembayaran' },
         {
-          src: '/2.png',
+          src: '/projects/cleanride/confirmation.png',
           caption: 'Halaman Konfirmasi Pesanan Berhasil & Status Menunggu Pembayaran',
         },
       ],
@@ -800,7 +817,7 @@ export default function App() {
       title: 'SuaraWeb — Smart Inclusive Web Accessibility Assistant',
       category: 'SOCIAL TECH & FRONTEND WEB DEVELOPMENT',
       year: '2026',
-      thumbnail: '/suaraweb-1-tunanetra.png',
+      thumbnail: '/projects/suaraweb/1-tunanetra.png',
       shortDesc:
         'SuaraWeb adalah aplikasi web asisten aksesibilitas adaptif yang dirancang untuk membantu penyandang disabilitas netra (tunanetra/low-vision) dan teman tuli (tunarungu) dalam mengakses informasi digital serta berkomunikasi sehari-hari. Memadukan sintesis suara alami (Text-to-Speech), transkripsi ucapan waktu nyata (Speech-to-Text), dan antarmuka adaptif berstandar WCAG AAA.',
       tags: ['React.js', 'Vite', 'Tailwind CSS', 'Web Speech API', 'WCAG AAA'],
@@ -819,20 +836,61 @@ export default function App() {
       },
       gallery: [
         {
-          src: '/suaraweb-1-tunanetra.png',
+          src: '/projects/suaraweb/1-tunanetra.png',
           caption: 'Mode Tunanetra & Low-Vision: Perintah Suara (Spasi) & Teks Ringkasan Pintar',
         },
         {
-          src: '/suaraweb-2-kontras.png',
+          src: '/projects/suaraweb/2-kontras.png',
           caption: 'Dynamic High-Contrast & Dyslexia Mode: Tema Hitam Murni & Teks Kuning Cerah',
         },
         {
-          src: '/suaraweb-3-transcriber.png',
+          src: '/projects/suaraweb/3-transcriber.png',
           caption: 'Mode Tunarungu & Teman Tuli: Transkripsi Percakapan Real-Time (Live Transcriber)',
         },
         {
-          src: '/suaraweb-4-komunikasi.png',
+          src: '/projects/suaraweb/4-komunikasi.png',
           caption: 'Papan Komunikasi Cepat: Kartu Frasa Instan Layar Penuh untuk Interaksi Tatap Muka',
+        },
+      ],
+    },
+    {
+      id: 'standchilla',
+      number: '06',
+      title: 'Stand Chilla — E-Catalog & WhatsApp Commerce',
+      category: 'FULL-STACK WEB DEVELOPMENT',
+      year: '2026',
+      thumbnail: '/projects/standchilla/hero.png',
+      shortDesc:
+        'Platform katalog digital dan sistem pemesanan suvenir terintegrasi WhatsApp untuk toko ritel di kawasan wisata Klenteng Sam Poo Kong, Semarang.',
+      tags: ['Laravel 11', 'MySQL', 'Vanilla JS', 'REST API'],
+      githubUrl: 'https://github.com/EvanPrasetya',
+      details: {
+        problem:
+          'Pemilik toko suvenir di area wisata kesulitan membagikan daftar harga terbaru dan ketersediaan stok kepada pelanggan jarak jauh maupun pengunjung saat toko sedang ramai.',
+        solution:
+          'Membangun aplikasi web katalog responsif dengan arsitektur decoupled (Laravel RESTful API + Frontend modern) dan fitur Floating Cart yang otomatis menyusun format pesanan ke WhatsApp.',
+        features: [
+          'RESTful API & Admin CRUD (Laravel 11 & MySQL): Memungkinkan pemilik toko memperbarui harga, menambah produk, dan mengatur status stok secara real-time.',
+          'Dynamic Cart & WA Checkout: Kalkulasi subtotal belanja otomatis dengan konversi pesan pesanan siap kirim ke WhatsApp Business.',
+          'Resilient Architecture & UX: Dilengkapi mekanisme local fallback data, integrasi rute lokasi toko, serta animasi scroll reveal.',
+        ],
+      },
+      gallery: [
+        {
+          src: '/projects/standchilla/hero.png',
+          caption: 'Tampilan Hero Katalog Stand Chilla (Mode Layar Penuh)',
+        },
+        {
+          src: '/projects/standchilla/catalog.png',
+          caption: 'Tata Letak Tipografi & Navigasi Katalog Produk Suvenir',
+        },
+        {
+          src: '/projects/standchilla/cart.png',
+          caption: 'Drawer Keranjang Suvenir Dinamis & Kalkulasi Estimasi Harga',
+        },
+        {
+          src: '/projects/standchilla/admin.png',
+          caption: 'Dashboard Admin Laravel untuk Input & Manajemen Stok Suvenir',
         },
       ],
     },
@@ -849,7 +907,7 @@ export default function App() {
       date: '29 September 2026',
       year: '2026',
       category: 'SERTIFIKAT KEPANITIAAN ORGANISASI',
-      previewImage: '/sertif-tisi-insight-2026.png',
+      previewImage: '/certificates/sertif-tisi-insight-2026.png',
       description:
         'Diberikan kepada Alfarell Nabil Evan Prasetya sebagai bentuk penghargaan atas dedikasi, tanggung jawab, dan peran aktifnya sebagai Anggota Divisi Media dalam mendukung kelancaran dan keberhasilan kegiatan seminar TISI INSIGHT 2026 yang diselenggarakan oleh Himpunan Mahasiswa Teknologi Informasi (HIMMATISI) FTIK Universitas Semarang.',
     },
@@ -862,7 +920,7 @@ export default function App() {
       date: '12–13 Januari 2026',
       year: '2026',
       category: 'SERTIFIKAT APRESIASI ORGANISASI',
-      previewImage: '/sertif-himmatisi-solidarity-2026.jpg',
+      previewImage: '/certificates/sertif-himmatisi-solidarity-2026.jpg',
       description:
         'Sertifikat Apresiasi diberikan kepada Alfarell Nabil Evan Prasetya sebagai peserta kegiatan HIMMATISI One Night Solidarity dengan tema "CTRL+S : Save the Moment and Solidarity" pada 12–13 Januari 2026 di Promas Greenland.',
     },
@@ -875,7 +933,7 @@ export default function App() {
       date: '12 Oktober 2024',
       year: '2024',
       category: 'SERTIFIKAT KEGIATAN HIMPUNAN',
-      previewImage: '/sertif-kuliah-umum-2024.jpg',
+      previewImage: '/certificates/sertif-kuliah-umum-2024.jpg',
       description:
         'Sertifikat diberikan kepada Alfarell Nabil Evan Prasetya sebagai Peserta dalam kegiatan Kuliah Umum dan Sarasehan yang diselenggarakan oleh Himpunan Mahasiswa Jurusan Teknologi Informasi (HIMMATISI) Fakultas Teknologi Informasi dan Komunikasi Universitas Semarang pada 12 Oktober 2024.',
     },
@@ -1576,16 +1634,33 @@ export default function App() {
                             <span>Lihat Detail &amp; Studi Kasus</span>
                             <ArrowUpRight className="w-3.5 h-3.5" />
                           </span>
-                          <a
-                            href={project.githubUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            onClick={(e) => e.stopPropagation()}
-                            title="Lihat Repositori GitHub"
-                            className="p-2 rounded-lg bg-white/5 hover:bg-[#3B82F6] border border-white/10 text-[#94A3B8] hover:text-white transition-colors"
-                          >
-                            <GithubIcon className="w-3.5 h-3.5" />
-                          </a>
+                          <div className="flex items-center gap-2">
+                            {project.liveUrl && (
+                              <a
+                                href={project.liveUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                onClick={(e) => e.stopPropagation()}
+                                title="Buka Live Website"
+                                className="px-2.5 py-1.5 rounded-lg bg-[#3B82F6]/20 hover:bg-[#3B82F6] border border-[#3B82F6]/40 text-[#38BDF8] hover:text-white font-mono text-[10px] font-bold transition-colors inline-flex items-center gap-1"
+                              >
+                                <span>Live</span>
+                                <ExternalLink className="w-3 h-3" />
+                              </a>
+                            )}
+                            {project.githubUrl && (
+                              <a
+                                href={project.githubUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                onClick={(e) => e.stopPropagation()}
+                                title="Lihat Repositori GitHub"
+                                className="p-2 rounded-lg bg-white/5 hover:bg-[#3B82F6] border border-white/10 text-[#94A3B8] hover:text-white transition-colors"
+                              >
+                                <GithubIcon className="w-3.5 h-3.5" />
+                              </a>
+                            )}
+                          </div>
                         </div>
                       </div>
                     </Interactive3DCard>
@@ -2228,16 +2303,31 @@ export default function App() {
                     </span>
                   ))}
                 </div>
-                <a
-                  href={selectedProject.githubUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center justify-center gap-2.5 rounded-xl bg-[#3B82F6] hover:bg-[#60A5FA] text-[#0A1424] font-mono text-xs font-bold uppercase tracking-wider px-5 py-2.5 transition-colors"
-                >
-                  <GithubIcon className="w-4 h-4" />
-                  <span>SOURCE CODE GITHUB</span>
-                  <ExternalLink className="w-3.5 h-3.5" />
-                </a>
+                <div className="flex flex-wrap items-center gap-3">
+                  {selectedProject.liveUrl && (
+                    <a
+                      href={selectedProject.liveUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center justify-center gap-2.5 rounded-xl bg-[#3B82F6] hover:bg-[#60A5FA] text-[#0A1424] font-mono text-xs font-bold uppercase tracking-wider px-5 py-2.5 transition-colors"
+                    >
+                      <span>BUKA LIVE WEBSITE</span>
+                      <ExternalLink className="w-3.5 h-3.5" />
+                    </a>
+                  )}
+                  {selectedProject.githubUrl && (
+                    <a
+                      href={selectedProject.githubUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center justify-center gap-2.5 rounded-xl border border-[#263B59] bg-[#0A1424] hover:border-[#3B82F6] text-[#F1F5F9] font-mono text-xs font-bold uppercase tracking-wider px-5 py-2.5 transition-colors"
+                    >
+                      <GithubIcon className="w-4 h-4 text-[#38BDF8]" />
+                      <span>SOURCE CODE GITHUB</span>
+                      <ExternalLink className="w-3.5 h-3.5" />
+                    </a>
+                  )}
+                </div>
               </div>
 
               {/* Tantangan (Problem), Solusi (Solution), & Fitur Utama */}
